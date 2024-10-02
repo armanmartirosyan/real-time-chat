@@ -7,7 +7,8 @@
     "dev": "npx nodemon",
     "start": "npm run build && node .dist/index.js",
     "build": "npm run clean && npx tsc",
-    "clean": "npx rimraf ./dist"
+    "clean": "npx rimraf ./dist",
+    "fclean": "npm run clean && npx rimraf ./src/logs"
   },
   "repository": {
     "type": "git",
