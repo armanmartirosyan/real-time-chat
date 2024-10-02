@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Back-end for real time chat",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "npx nodemon",
     "start": "npm run build && node .dist/index.js",
@@ -38,6 +38,7 @@
     "express": "^4.21.0",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
     "morgan": "^1.10.0",
     "rimraf": "^6.0.1"
   }
