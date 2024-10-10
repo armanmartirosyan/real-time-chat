@@ -1,0 +1,106 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
+}
+
+body 
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #000;
+}
+
+
+.signin {
+  background: #222;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  border-radius: 5px;
+}
+
+
+.content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content h2 {
+  font-size: 2em;
+  color: #0F0;
+  text-transform: uppercase;
+}
+
+
+.input-box {
+  position: relative;
+  width: 100%;
+}
+
+.input-box input {
+  width: 100%;
+  background: #333;
+  border: none;
+  outline: none;
+  padding: 15px 10px;
+  border-radius: 4px;
+  color: #FFF;
+  font-weight: 500;
+  font-size: 1em;
+  margin: 10px;
+}
+
+.input-box label {
+  position: absolute;
+  left: 25px;
+  top: 25px;
+  transition: 0.4s ease all;
+  color: #999;
+}
+
+.input-box input:focus + label,
+.input-box input:not(:placeholder-shown) + label {
+  top: 10px;
+  left: 20px;
+  font-size: 0.85em;
+}
+
+.login-form .links {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.login-form .links a {
+  text-decoration: none;
+  color: #FFF;
+}
+
+.login-form .links a:nth-child(2) {
+  color: #0F0;
+  font-weight: 600;
+}
+
+.form-submit-btn input {
+  background-color: #0F0;
+  color: #000;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  padding: 10px;
+  font-weight: 600;
+}
+
+.form-submit-btn input:active {
+  opacity: 0.6;
+}
