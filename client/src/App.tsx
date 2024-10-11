@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import Login from "./components/Login.js";
+import Login from "./components/UI/Login.js";
+import Signup from "./components/UI/Signup.js";
+import "./index.css"
 
 function App(): React.JSX.Element {
 
 
     return (
-        <Login/>
+        <div>
+            <Login/>
+            {/* <Signup/> */}
+        </div>
     );
 }
 

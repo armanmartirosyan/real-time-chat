@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./Login.css";
+import InputBox from "../UI/InputBox/InputBox";
+import classes from "../UI/InputBox/InputBox.module.css"
 
 export default function Login(): React.JSX.Element {
     const [email, setEmail] = useState<string>('');
@@ -16,31 +17,28 @@ export default function Login(): React.JSX.Element {
             <div className="signin">
                 <div className="content">
                     <h2>Sign In</h2>
-                    <form className="login-form">
-                        <div className="input-box">
-                            <input 
-                            type="email" 
+                    <form className="root-form">
+                        <InputBox
+                            type="email"
                             required 
                             value={email}
-                            onChange={(e) => handleInputChange(e, setEmail)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, setEmail)}
                             placeholder=" "
-                            autoComplete="email" />
-                            <label>Email</label>
-                        </div>
-                        <div className="input-box">
-                            <input 
+                            autoComplete="email"
+                            label="Email"/>
+                        <InputBox 
                             type="password"
                             required 
                             value={password}
                             onChange={(e) => handleInputChange(e, setPassword)}
                             placeholder=" " 
-                            autoComplete="current-password" />
-                            <label>Password</label>
-                        </div>
+                            autoComplete="current-password"
+                            label="Password" />
+
                         <div className="links">
                             <a href="#">Forgot password</a> <a href="#">Signup</a>
                         </div>
-                        <div className="input-box form-submit-btn">
+                        <div className={`${classes["input-box"]} form-submit-btn`}>
                             <input type="submit" value="Login"/>
                         </div>
                     </form>
