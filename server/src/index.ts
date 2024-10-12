@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import colors from "./helpers/colors.js";
 import { loggerSetup } from "./helpers/loggerSetup.js";
+import router from "./routes/routes.js"
 import express, {Express, Request, Response} from "express";
 
 
@@ -19,6 +20,8 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
 	res.json({ message: "Server something else" });
 });
+
+app.use("/api", router);
 
 async function startServer(): Promise<void> {
 	try {
