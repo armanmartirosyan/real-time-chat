@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/UserModel.js";
 import UserService from "../services/userService.js";
-import { UserCredentials } from "../@types/index.d.js";
+import { userNamespace } from "../@types/index.d.js";
+import mongoose from "mongoose";
 
 class UserController {
 	userService: UserService;
@@ -10,20 +11,16 @@ class UserController {
 		this.userService = new UserService();
 	}
 
-	async registration(req: Request, res: Response, next: NextFunction): Promise<any> {
-			const {email, username, password, passwordConfirm }: UserCredentials = req.body;
-			
-			try {
-				const user = new User({ email, username, password, activationLink: "somelink" });
-				// TODO: call user service to save the user
-				await user.save();
-				res.status(201).json(user);
-			} catch (error: any) {
-				console.log(error.errorResponse);
-				if (error.errorResponse?.code === 11000) {
-					res.status(400).json({ message: `User already exist`, error: error.errorResponse.keyValue })
-				}
-			}
+	async registration(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const {email, username, password, passwordConfirm }: userNamespace.UserCredentials = req.body;
+			const userData: userNamespace.IUserDTO = await this.userService.registration(email, username, password, passwordConfirm);
+			res.cookie("refreshToken", userData.tokenPair.refreshToken, {maxAge: 60 * 60 * 1000, httpOnly: true});
+			res.json(userData);
+			return ;
+		} catch (error: any) {
+			next(error);
+		}
 	}
 }
 
