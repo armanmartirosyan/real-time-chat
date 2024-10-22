@@ -10,8 +10,7 @@ export default function(err: Error, req: Request, res: Response, next: NextFunct
 		return;
 	}
 	if (err instanceof mongoose.mongo.MongoServerError) {
-		writeToErrorFile(err, "MongoServerError");
-		res.status(400).json({ message: `User already exist`, error: err.errorResponse.keyValue })
+		res.status(400).json({ message: "User already exist.", error: err.errorResponse.keyValue })
 		return;
 	}
 	if (err instanceof APIError) {
