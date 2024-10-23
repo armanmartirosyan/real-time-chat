@@ -18,7 +18,7 @@ const tokensSchema: Schema<ITokens> = new Schema({
     },
 	expiresAt: {
         type: Date,
-        default: () => new Date(Date.now() + 60 * 60 * 1000),
+        default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
         expires: '1d'
     },
 }, { timestamps: true });

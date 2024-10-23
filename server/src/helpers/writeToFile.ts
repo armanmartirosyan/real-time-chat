@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import colors from "./colors.js";
+import colors from "./colors";
 
 export function writeToErrorFile(err: Error, info: string) {
 	console.log(`${colors.red}${info}: Check './logs/error.log' for details.${colors.reset}`);

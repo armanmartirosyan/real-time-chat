@@ -1,13 +1,13 @@
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import router from "./routes/routes.js";
-import colors from "./helpers/colors.js";
-import cookieParser from "cookie-parser";
-import { loggerSetup } from "./helpers/loggerSetup.js";
-import express, {Express, Request, Response} from "express";
-import errorMiddleware from "./middlewares/errorMiddleware.js";
-
 dotenv.config();
+import mongoose from "mongoose";
+import router from "./routes/routes";
+import colors from "./helpers/colors";
+import cookieParser from "cookie-parser";
+import { loggerSetup } from "./helpers/loggerSetup";
+import express, {Express, Request, Response} from "express";
+import errorMiddleware from "./middlewares/errorMiddleware";
+
 
 const app: Express = express();
 const PORT: number = Number(process.env.PORT) || 8080;

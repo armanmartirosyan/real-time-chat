@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import logger from "morgan";
 import { Express } from "express";
-import colors from "./colors.js";
+import colors from "./colors";
 
 
 

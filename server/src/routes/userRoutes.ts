@@ -1,5 +1,5 @@
 import { Router, Request, Response  } from "express";
-import UserController from "../controllers/userController.js";
+import UserController from "../controllers/userController";
 import { body } from "express-validator";
 
 const userRoutes: Router = Router();

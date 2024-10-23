@@ -1,4 +1,4 @@
-import { userNamespace, JwtTokens } from "../@types/index.d.js";
+import { userNamespace, JwtTokens } from "../@types/index.d";
 
 export default class UserDTO {
 	email: string;
