@@ -22,7 +22,6 @@
   "homepage": "https://github.com/armanmartirosyan/real-time-chat#readme",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "@types/connect": "^3.4.38",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
