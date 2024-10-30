@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/UserModel";
 import UserService from "../services/userService";
-import { userNamespace } from "../@types/index.d";
+import { userNS } from "../@types/index.d";
 import { Request, Response, NextFunction } from "express";
 import { Result, ValidationError, validationResult } from "express-validator";
 import APIError from "../exceptions/apiError";
@@ -18,12 +18,27 @@ class UserController {
 			const errors: Result<ValidationError> = validationResult(req);
 			if (!errors.isEmpty())
 				throw APIError.BadRequest("Validaiton Error", errors.array());
-			const {email, username, password, passwordConfirm }: userNamespace.UserCredentials = req.body;
-			const userData: userNamespace.IUserDTO = await this.userService.registration(email, username, password, passwordConfirm);
-			res.cookie("refreshToken", userData.tokenPair.refreshToken, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true});
+			const {email, username, password, passwordConfirm }: userNS.RegistrationCredentials = req.body;
+			const userData: userNS.IUserDTO = await this.userService.registration(email, username, password, passwordConfirm);
+			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
 			res.json(userData);
 			return ;
 		} catch (error: any) {
+			next(error);
+		}
+	}
+
+	async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try{
+			const errors: Result<ValidationError> = validationResult(req);
+			if (!errors.isEmpty())
+				throw APIError.BadRequest("validation Error", errors.array());
+			const { email, password }: userNS.LoginCredentials = req.body;
+			const userData: userNS.IUserDTO = await this.userService.login(email, password);
+			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+			res.json(userData);
+			return ;
+		} catch(error: any) {
 			next(error);
 		}
 	}

@@ -1,10 +1,15 @@
 
-export namespace userNamespace {
-	interface UserCredentials {
+export namespace userNS {
+	interface RegistrationCredentials {
 		email: string,
 		username: string,
 		password: string,
 		passwordConfirm: string,
+	}
+
+	interface LoginCredentials {
+		email: string,
+		password: string,
 	}
 
 	interface IUserDTO {

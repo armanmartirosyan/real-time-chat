@@ -13,6 +13,7 @@ userRoutes.post("/registration",
 	userController.registration.bind(userController)
 );
 
+userRoutes.post("/login", userController.login.bind(userController));
 userRoutes.get("/activate/:link", userController.activate.bind(userController));
 
 

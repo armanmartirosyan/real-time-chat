@@ -12,9 +12,11 @@ class TokenService {
 	}
 
 	async saveToken(userID: mongoose.Schema.Types.ObjectId, refreshToken: string): Promise<void> {
+		const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
 		await Tokens.findOneAndUpdate(
 			{ userID },
-			{ refreshToken },
+			{ refreshToken, expiresAt},
 			{ upsert: true, new: true }
 		);
 		return ;

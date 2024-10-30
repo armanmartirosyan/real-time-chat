@@ -4,7 +4,7 @@ import UserDTO from "../dtos/userDTO";
 import User from "../models/UserModel";
 import Tokens from "../models/TokenModel";
 import TokenService from "./tokenService";
-import { userNamespace, JwtTokens } from "../@types/index";
+import { userNS, JwtTokens } from "../@types/index";
 import APIError from "../exceptions/apiError";
 import MailService from "./mailService";
 
@@ -17,9 +17,9 @@ class UserService {
 		this.mailService = new MailService();
 	}
 
-	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNamespace.IUserDTO> {
+	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNS.IUserDTO> {
 		if (password !== passwordConfirm)
-			throw APIError.BadRequest("Validation Error", [{msg: "Wrong username or password"}]);
+			throw APIError.BadRequest("Validation Error", [{msg: "Invalid username or password"}]);
 		const hashedPassword = await bcrypt.hash(password, 3);
 		const activationLink: string = uuid.v4();
 		const user = new User({email, username, password: hashedPassword, activationLink});
@@ -31,6 +31,22 @@ class UserService {
 		await user.save();
 		
 		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens})
+		return userDTO;
+	}
+
+	async login(email: string, password: string): Promise<userNS.IUserDTO> {
+		const user = await User.findOne({ email });
+		if (!user)
+			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
+
+		const passwordMatch: boolean = await bcrypt.compare(password, user.password);
+		if (!passwordMatch)
+			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
+
+		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
+		await this.tokenService.saveToken(user._id, tokens.refreshToken);
+		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens});
+		
 		return userDTO;
 	}
 
