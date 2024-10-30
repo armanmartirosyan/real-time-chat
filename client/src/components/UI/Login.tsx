@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import InputBox from "../UI/InputBox/InputBox";
-import classes from "../UI/InputBox/InputBox.module.css"
+import "../../types/index.d.ts";
+import InputBox from "./InputBox/InputBox";
+import classes from "./InputBox/InputBox.module.css";
 
 export default function Login(): React.JSX.Element {
     const [email, setEmail] = useState<string>('');
