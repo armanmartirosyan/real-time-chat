@@ -13,6 +13,8 @@ userRoutes.post("/registration",
 	userController.registration.bind(userController)
 );
 
+userRoutes.get("/activate/:link", userController.activate.bind(userController));
+
 
 
 export default userRoutes;

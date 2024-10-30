@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import cors from "cors";
 import mongoose from "mongoose";
 import router from "./routes/routes";
 import colors from "./helpers/colors";
@@ -8,7 +9,6 @@ import { loggerSetup } from "./helpers/loggerSetup";
 import express, {Express, Request, Response} from "express";
 import errorMiddleware from "./middlewares/errorMiddleware";
 
-
 const app: Express = express();
 const PORT: number = Number(process.env.PORT) || 8080;
 
@@ -16,6 +16,7 @@ loggerSetup(app, process.env.NODE_ENV!);
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
 	res.json({ message: "Server something else" });

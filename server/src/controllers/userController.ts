@@ -27,6 +27,17 @@ class UserController {
 			next(error);
 		}
 	}
+
+	async activate(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const activationLink: string = req.params.link;
+			await this.userService.activate(activationLink);
+			res.redirect(process.env.CLIENT_URL!);
+			return ;
+		} catch(error: any) {
+			next(error);
+		}
+	}
 }
 
 export default UserController;

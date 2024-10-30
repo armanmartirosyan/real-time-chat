@@ -19,20 +19,28 @@ class UserService {
 
 	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNamespace.IUserDTO> {
 		if (password !== passwordConfirm)
-			throw APIError.BadRequest("Validation Error");
+			throw APIError.BadRequest("Validation Error", [{msg: "Wrong username or password"}]);
 		const hashedPassword = await bcrypt.hash(password, 3);
 		const activationLink: string = uuid.v4();
 		const user = new User({email, username, password: hashedPassword, activationLink});
 		
-		await this.mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+		await this.mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
 
-		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000});
-		const tokenModel = new Tokens({userID: user._id, refreshToken: tokens.refreshToken});
+		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
+		await this.tokenService.saveToken(user._id, tokens.refreshToken);
 		await user.save();
-		await tokenModel.save();
 		
 		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens})
 		return userDTO;
+	}
+
+	async activate(activationLink: string): Promise<void> {
+		const user = await User.findOne({ activationLink });
+		if (!user)
+			throw APIError.BadRequest("Link error", [{ msg: "Incorrect activation link" }]);
+		user.isValid = true;
+		await user.save();
+		return ;
 	}
 }
 

@@ -1,6 +1,7 @@
 import mongoose, {Document, Schema} from "mongoose";
 
 interface IUser extends Document {
+	_id: mongoose.Schema.Types.ObjectId;
 	email: string;
 	username: string;
 	password: string;

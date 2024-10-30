@@ -14,7 +14,8 @@ const tokensSchema: Schema<ITokens> = new Schema({
     },
     refreshToken: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
 	expiresAt: {
         type: Date,
