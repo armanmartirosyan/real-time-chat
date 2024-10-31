@@ -18,10 +18,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 
-app.get("/", (req: Request, res: Response) => {
-	res.json({ message: "Server something else" });
-});
-
 app.use("/api", router);
 app.use(errorMiddleware);
 

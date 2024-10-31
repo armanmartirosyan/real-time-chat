@@ -1,10 +1,8 @@
-import mongoose from "mongoose";
-import User from "../models/UserModel";
-import UserService from "../services/userService";
 import { userNS } from "../@types/index.d";
+import APIError from "../exceptions/apiError";
+import UserService from "../services/userService";
 import { Request, Response, NextFunction } from "express";
 import { Result, ValidationError, validationResult } from "express-validator";
-import APIError from "../exceptions/apiError";
 
 class UserController {
 	userService: UserService;
@@ -37,6 +35,18 @@ class UserController {
 			const userData: userNS.IUserDTO = await this.userService.login(email, password);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
 			res.json(userData);
+			return ;
+		} catch(error: any) {
+			next(error);
+		}
+	}
+
+	async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try{
+			const { refreshToken }: Record<string, string> = req.cookies;
+			await this.userService.logout(refreshToken);
+			res.clearCookie("refreshToken");
+			res.status(200).json({msg: "Success"});
 			return ;
 		} catch(error: any) {
 			next(error);

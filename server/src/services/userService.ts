@@ -2,7 +2,6 @@ import * as uuid from "uuid";
 import bcrypt from "bcryptjs";
 import UserDTO from "../dtos/userDTO";
 import User from "../models/UserModel";
-import Tokens from "../models/TokenModel";
 import TokenService from "./tokenService";
 import { userNS, JwtTokens } from "../@types/index";
 import APIError from "../exceptions/apiError";
@@ -49,6 +48,11 @@ class UserService {
 		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens});
 		
 		return userDTO;
+	}
+
+	async logout(refreshToken: string): Promise<void> {
+		await this.tokenService.removeToken(refreshToken);
+		return ;
 	}
 
 	async activate(activationLink: string): Promise<void> {

@@ -1,7 +1,8 @@
+import mongoose from "mongoose";
+import Tokens from "../models/TokenModel";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import { JwtTokens } from "../@types/index.d";
-import Tokens from "../models/TokenModel";
-import mongoose from "mongoose";
+import APIError from "../exceptions/apiError";
 
 class TokenService {
 	generateTokens(payload: JwtPayload): JwtTokens.TokenPair {
@@ -19,6 +20,14 @@ class TokenService {
 			{ refreshToken, expiresAt},
 			{ upsert: true, new: true }
 		);
+		return ;
+	}
+
+	async removeToken(refreshToken: string): Promise<void> {
+		const token = await Tokens.findOne({ refreshToken });
+		if (!token)
+			throw APIError.NoContent("No Content");
+		await token.deleteOne();
 		return ;
 	}
 }

@@ -17,6 +17,10 @@ class APIError extends Error{
 	static BadRequest(message: string, errors: any = []): APIError {
 		return new APIError(400, message, errors);
 	}
+
+	static NoContent(message: string, errors: any = []): APIError {
+		return new APIError(404, message, errors);
+	}
 }
 
 export default APIError;
