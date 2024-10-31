@@ -25,4 +25,6 @@ export namespace JwtTokens {
 		accessToken: string;
 		refreshToken: string;
 	}
+	
+	export type VerifiedJWT = string | jwt.JwtPayload | null;
 }

@@ -1,4 +1,4 @@
-import { userNS } from "../@types/index.d";
+import { JwtTokens, userNS } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
 import UserService from "../services/userService";
 import { Request, Response, NextFunction } from "express";
@@ -58,6 +58,18 @@ class UserController {
 			const activationLink: string = req.params.link;
 			await this.userService.activate(activationLink);
 			res.redirect(process.env.CLIENT_URL!);
+			return ;
+		} catch(error: any) {
+			next(error);
+		}
+	}
+
+	async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try{
+			const { refreshToken }: Record<string, string> = req.cookies;
+			const userData: userNS.IUserDTO = await this.userService.refresh(refreshToken);
+			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+			res.json(userData);
 			return ;
 		} catch(error: any) {
 			next(error);

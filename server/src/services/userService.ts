@@ -2,10 +2,11 @@ import * as uuid from "uuid";
 import bcrypt from "bcryptjs";
 import UserDTO from "../dtos/userDTO";
 import User from "../models/UserModel";
-import TokenService from "./tokenService";
-import { userNS, JwtTokens } from "../@types/index";
-import APIError from "../exceptions/apiError";
 import MailService from "./mailService";
+import TokenService from "./tokenService";
+import APIError from "../exceptions/apiError";
+import { ITokens } from "../models/TokenModel";
+import { userNS, JwtTokens } from "../@types/index";
 
 class UserService {
 	tokenService: TokenService;
@@ -62,6 +63,26 @@ class UserService {
 		user.isValid = true;
 		await user.save();
 		return ;
+	}
+
+	async refresh(refreshToken: string): Promise<userNS.IUserDTO> {
+		if (!refreshToken)
+			throw APIError.UnauthorizedError();
+
+		const userData: JwtTokens.VerifiedJWT = this.tokenService.verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET!);
+		const isTokenInDB: ITokens | null = await this.tokenService.findToken(refreshToken);
+		if (!userData || !isTokenInDB)
+			throw APIError.UnauthorizedError();
+		
+		const user = await User.findOne({ _id: userData.userID });
+		if (!user)
+			throw APIError.UnauthorizedError();
+
+		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
+		await this.tokenService.saveToken(user._id, tokens.refreshToken);
+		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens});
+		
+		return userDTO;
 	}
 }
 

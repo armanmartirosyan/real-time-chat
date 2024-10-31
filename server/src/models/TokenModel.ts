@@ -1,6 +1,6 @@
 import mongoose, {Document, Schema} from "mongoose";
 
-interface ITokens extends Document {
+export interface ITokens extends Document {
 	_id: mongoose.Schema.Types.ObjectId;
 	userID: mongoose.Schema.Types.ObjectId,
 	refreshToken: string,

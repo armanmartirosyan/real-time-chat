@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Tokens from "../models/TokenModel";
+import Tokens, {ITokens } from "../models/TokenModel";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import { JwtTokens } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
@@ -23,12 +23,26 @@ class TokenService {
 		return ;
 	}
 
+	async findToken(refreshToken: string): Promise<ITokens | null> {
+		const token = await Tokens.findOne({ refreshToken });
+		return token;
+	}
+
 	async removeToken(refreshToken: string): Promise<void> {
 		const token = await Tokens.findOne({ refreshToken });
 		if (!token)
 			throw APIError.NoContent("No Content");
 		await token.deleteOne();
 		return ;
+	}
+
+	verifyToken(token: string, secret: string): JwtTokens.VerifiedJWT {
+		try {
+			const userData: JwtTokens.VerifiedJWT = jwt.verify(token, secret);
+			return userData;
+		} catch(error: any) {
+			throw APIError.UnauthorizedError();
+		}
 	}
 }
 
