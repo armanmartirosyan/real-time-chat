@@ -24,12 +24,13 @@ class UserService {
 		const activationLink: string = uuid.v4();
 		const user = new User({email, username, password: hashedPassword, activationLink});
 		
-		await this.mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
-
+		
 		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
 		await this.tokenService.saveToken(user._id, tokens.refreshToken);
 		await user.save();
 		
+		await this.mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
+
 		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens})
 		return userDTO;
 	}
