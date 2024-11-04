@@ -75,6 +75,17 @@ class UserController {
 			next(error);
 		}
 	}
+
+	async getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const username: string = req.params.username;
+			const userDTO = await this.userService.getUser(username);
+			res.json(userDTO);
+			return ;
+		} catch(error:any) {
+			next(error);
+		}
+	}
 }
 
 export default UserController;

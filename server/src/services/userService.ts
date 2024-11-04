@@ -93,6 +93,16 @@ class UserService {
 			tokenPair: tokens,
 		};
 	}
+
+	async getUser(username: string): Promise<userNS.IUserDTO> {
+		if (!username)
+			throw APIError.BadRequest("No such user");
+
+		const user = await User.findOne({ username });
+		if (!user)
+			throw APIError.BadRequest("No such user");
+		return new UserDTO(user);
+	}
 }
 
 export default UserService;

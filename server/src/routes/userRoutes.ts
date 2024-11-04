@@ -17,9 +17,7 @@ userRoutes.post("/login", userController.login.bind(userController));
 userRoutes.post("/logout", userController.logout.bind(userController));
 userRoutes.get("/activate/:link", userController.activate.bind(userController));
 userRoutes.get("/refresh", userController.refresh.bind(userController));
-userRoutes.get("/:username", authMiddleware, (req:Request, res: Response) => {
-	res.json({msg:"valid"});
-})
+userRoutes.get("/:username", authMiddleware, userController.getUser.bind(userController));
 
 
 
