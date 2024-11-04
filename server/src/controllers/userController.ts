@@ -17,7 +17,7 @@ class UserController {
 			if (!errors.isEmpty())
 				throw APIError.BadRequest("Validaiton Error", errors.array());
 			const {email, username, password, passwordConfirm }: userNS.RegistrationCredentials = req.body;
-			const userData: userNS.IUserDTO = await this.userService.registration(email, username, password, passwordConfirm);
+			const userData: userNS.AuthResponseDTO = await this.userService.registration(email, username, password, passwordConfirm);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
 			res.json(userData);
 			return ;
@@ -32,7 +32,7 @@ class UserController {
 			if (!errors.isEmpty())
 				throw APIError.BadRequest("validation Error", errors.array());
 			const { email, password }: userNS.LoginCredentials = req.body;
-			const userData: userNS.IUserDTO = await this.userService.login(email, password);
+			const userData: userNS.AuthResponseDTO = await this.userService.login(email, password);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
 			res.json(userData);
 			return ;
@@ -67,7 +67,7 @@ class UserController {
 	async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try{
 			const { refreshToken }: Record<string, string> = req.cookies;
-			const userData: userNS.IUserDTO = await this.userService.refresh(refreshToken);
+			const userData: userNS.AuthResponseDTO = await this.userService.refresh(refreshToken);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
 			res.json(userData);
 			return ;

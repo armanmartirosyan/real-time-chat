@@ -17,7 +17,7 @@ class UserService {
 		this.mailService = new MailService();
 	}
 
-	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNS.IUserDTO> {
+	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNS.AuthResponseDTO> {
 		if (password !== passwordConfirm)
 			throw APIError.BadRequest("Validation Error", [{msg: "Invalid username or password"}]);
 		const hashedPassword = await bcrypt.hash(password, 3);
@@ -31,11 +31,14 @@ class UserService {
 		
 		await this.mailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
 
-		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens})
-		return userDTO;
+		const userDTO = new UserDTO(user);
+		return {
+			user: userDTO,
+			tokenPair: tokens,
+		};
 	}
 
-	async login(email: string, password: string): Promise<userNS.IUserDTO> {
+	async login(email: string, password: string): Promise<userNS.AuthResponseDTO> {
 		const user = await User.findOne({ email });
 		if (!user)
 			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
@@ -46,9 +49,12 @@ class UserService {
 
 		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
 		await this.tokenService.saveToken(user._id, tokens.refreshToken);
-		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens});
+		const userDTO = new UserDTO(user);
 		
-		return userDTO;
+		return {
+			user: userDTO,
+			tokenPair: tokens,
+		};
 	}
 
 	async logout(refreshToken: string): Promise<void> {
@@ -65,7 +71,7 @@ class UserService {
 		return ;
 	}
 
-	async refresh(refreshToken: string): Promise<userNS.IUserDTO> {
+	async refresh(refreshToken: string): Promise<userNS.AuthResponseDTO> {
 		if (!refreshToken)
 			throw APIError.UnauthorizedError();
 
@@ -80,9 +86,12 @@ class UserService {
 
 		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id});
 		await this.tokenService.saveToken(user._id, tokens.refreshToken);
-		const userDTO = new UserDTO({email: user.email, username: user.username, isValid: user.isValid, tokenPair: tokens});
+		const userDTO = new UserDTO(user);
 		
-		return userDTO;
+		return {
+			user: userDTO,
+			tokenPair: tokens,
+		};
 	}
 }
 
