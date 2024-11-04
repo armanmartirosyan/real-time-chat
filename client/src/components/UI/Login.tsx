@@ -6,7 +6,6 @@ import classes from "./InputBox/InputBox.module.css";
 export default function Login(): React.JSX.Element {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [username, setUsername] = useState<string>('');
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
         handler(e.target.value);
@@ -23,7 +22,7 @@ export default function Login(): React.JSX.Element {
                             type="email"
                             required 
                             value={email}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, setEmail)}
+                            onChange={(e) => handleInputChange(e, setEmail)}
                             placeholder=" "
                             autoComplete="email"
                             label="Email"/>
