@@ -58,9 +58,11 @@ a {
 	justify-content: space-between;
 }
 
-.root-form .links a {
+.root-form .links a,
+.root-form .links p {
 	text-decoration: none;
 	color: #FFF;
+	cursor: pointer;
 }
 
 .root-form .links a:nth-child(2) {

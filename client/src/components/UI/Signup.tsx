@@ -60,7 +60,9 @@ export default function Signup(): React.JSX.Element {
                             placeholder=" " 
                             autoComplete="current-password"
                             label="Confirm Password" />
- 
+                        <div className="links">
+                            <p>Already have an account?</p> <a href="/login">Sign In</a>
+                        </div>
                         <div className={`${classes["input-box"]} form-submit-btn`}>
                             <input type="submit" value="Signup"/>
                         </div>
