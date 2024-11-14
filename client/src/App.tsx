@@ -7,18 +7,18 @@ import Navbar from "./components/UI/Navbar/Navbar";
 import "./index.css";
 
 function MainContent(): React.JSX.Element {
-  const { user, isAuth, setAuth } = useContext(UserContext);
+  const user = useContext(UserContext);
 
   useEffect(() => {
     const token: string | null = localStorage.getItem("token");
     if (token) {
-      setAuth(true);
+      user.setAuth(true);
     }
-  }, [setAuth]);
+  }, [user.setAuth]);
 
   return (
     <Routes>
-      <Route path="/" element={isAuth ? <Navigate to="/navbar" /> : <Navigate to="/signup" />} />
+      <Route path="/" element={user.isAuth ? <Navigate to="/navbar" /> : <Navigate to="/signup" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
     </Routes>
