@@ -1,16 +1,24 @@
-import React, { useState } from "react";
-import "../../types/index.d.ts";
+import React, { useContext, useState } from "react";
+import "../../@types/index.d";
 import InputBox from "./InputBox/InputBox";
 import classes from "./InputBox/InputBox.module.css"
+import { UserContext } from "../../store/userContext";
+
 
 export default function Signup(): React.JSX.Element {
     const [email, setEmail] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [passwordConfirm, setPasswordConfirm] = useState<string>('');
+    const user = useContext(UserContext);
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
         handler(e.target.value);
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        await user.registration(email, username, password, passwordConfirm);
     }
 
 
@@ -19,7 +27,7 @@ export default function Signup(): React.JSX.Element {
             <div className="signin">
                 <div className="content">
                     <h2>Sign Up</h2>
-                    <form className="root-form">
+                    <form className="root-form" onSubmit={handleSubmit}>
 						<InputBox
                             type="username"
                             required 
