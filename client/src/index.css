@@ -22,7 +22,7 @@ ul {
 
 a {
 	text-decoration: none;
-	cursor: default;
+	cursor: pointer;
 	color: inherit;
 }
 
@@ -80,3 +80,4 @@ a {
 .form-submit-btn input:active {
 	opacity: 0.6;
 }
+

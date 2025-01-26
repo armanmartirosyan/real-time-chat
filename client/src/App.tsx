@@ -1,27 +1,37 @@
-import React, { useContext, useEffect } from "react";
-import { UserContext, UserProvider } from "./store/userContext"; 
+import React, { useContext, useEffect, useState } from "react";
+import { UserContext, UserProvider } from "./contexts/userContext";
 import Login from "./components/UI/Login";
 import Signup from "./components/UI/Signup";
 import Navbar from "./components/UI/Navbar/Navbar";
 import "./index.css";
 
 function App(): React.JSX.Element {
-  const { user, isAuth, setAuth } = useContext(UserContext); 
+  const { user, isAuth, setAuth } = useContext(UserContext);
+  const [isLoginPage, setIsLoginPage] = useState<boolean>(false);
 
   useEffect(() => {
     const token: string | null = localStorage.getItem("token");
     if (token) {
       setAuth(true);
     }
-  }, [setAuth]); 
+  }, [setAuth]);
+
 
   return (
     <UserProvider>
-    <div>
-      {isAuth ? <Navbar username={user?.username || "Guest"} /> : <Signup />}
-    </div>
+      {/* {!isAuth ? (
+      isLoginPage ? (
+        <Login isLoginPage={isLoginPage} setIsLoginPage={setIsLoginPage} />
+      ) : (
+        <Signup isLoginPage={isLoginPage} setIsLoginPage={setIsLoginPage} />
+      )
+    ) : (
+      <Navbar username={user?.username || "Guest"}/>
+    )} */}
+      <Navbar username="asdf" />
     </UserProvider>
   );
+
 }
 
 export default App;
