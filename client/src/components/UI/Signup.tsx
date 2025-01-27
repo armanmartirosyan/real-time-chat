@@ -71,7 +71,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               label="Confirm Password" />
 
             <div className="links">
-              <a href="#">Forgot password</a> <a onClick={setAccount}>Login</a>
+              <a href="#">Forgot password</a> <a onClick={setAccount}>Sign In</a>
             </div>
             <div className={`${classes["input-box"]} form-submit-btn`}>
               <input type="submit" value="Signup" />
