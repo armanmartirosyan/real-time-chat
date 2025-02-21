@@ -1,24 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
-import { UserContext, UserProvider } from "./contexts/userContext";
+import React, { useContext, useState } from "react";
+import { UserContext } from "./contexts/userContext";
 import Login from "./components/UI/Login";
 import Signup from "./components/UI/Signup";
 import Navbar from "./components/UI/Navbar/Navbar";
 import "./index.css";
 
 function App(): React.JSX.Element {
-	const { user, isAuth, setIsAuth } = useContext(UserContext);
-	const [isLoginPage, setIsLoginPage] = useState<boolean>(false);
-
-	useEffect(() => {
-		const token: string | null = localStorage.getItem("token");
-		if (token) {
-			setIsAuth(true);
-		}
-	}, []);
-
+	const { user, isAuth } = useContext(UserContext);
+	const [isLoginPage, setIsLoginPage] = useState<boolean>(true);
 
 	return (
-		<UserProvider>
+		<>
 			{!isAuth ? (
 				isLoginPage ? (
 					<Login isLoginPage={isLoginPage} setIsLoginPage={setIsLoginPage} />
@@ -28,7 +20,7 @@ function App(): React.JSX.Element {
 			) : (
 				<Navbar username={user?.username || "Guest"} />
 			)}
-		</UserProvider>
+		</>
 	);
 
 }

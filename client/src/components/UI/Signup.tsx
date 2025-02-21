@@ -3,7 +3,7 @@ import "../../@types/index.d";
 import InputBox from "./InputBox/InputBox";
 import classes from "./InputBox/InputBox.module.css"
 import AccountCheck from "./AccountCheck/AccountCheck";
-import { UserContext } from "../../contexts/userContext";
+import { UserContext, UserContextType} from "../../contexts/userContext";
 
 interface SignupProps {
   isLoginPage: boolean;
@@ -15,7 +15,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
-  const user = useContext(UserContext);
+  const user: UserContextType= useContext(UserContext);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
     handler(e.target.value);
@@ -41,7 +41,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               type="username"
               required
               value={username}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, setUsername)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setUsername)}
               placeholder=" "
               autoComplete="username"
               label="Username" />

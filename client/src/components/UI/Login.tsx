@@ -1,8 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
 import "../../@types/index.d";
 import InputBox from "./InputBox/InputBox";
 import classes from "./InputBox/InputBox.module.css";
-import { UserContext } from "../../contexts/userContext";
+import { UserContext, UserContextType } from "../../contexts/userContext";
 
 interface LoginProps {
   isLoginPage: boolean;
@@ -12,10 +12,15 @@ interface LoginProps {
 export default function Login(props: LoginProps): React.JSX.Element {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const user = useContext(UserContext);
+  const user: UserContextType = useContext(UserContext);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
     handler(e.target.value);
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await user.login(email, password);
   }
 
   const setAccount = (e: React.MouseEvent<HTMLAnchorElement>): void => {
@@ -28,12 +33,12 @@ export default function Login(props: LoginProps): React.JSX.Element {
       <div className="signin">
         <div className="content">
           <h2>Sign In</h2>
-          <form className="root-form">
+          <form className="root-form" onSubmit={handleSubmit}>
             <InputBox
               type="email"
               required
               value={email}
-              onChange={(e) => handleInputChange(e, setEmail)}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setEmail)}
               placeholder=" "
               autoComplete="email"
               label="Email" />
