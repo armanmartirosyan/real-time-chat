@@ -4,7 +4,7 @@ import TokenService from "../services/tokenService";
 import express, { Request, Response, NextFunction } from "express";
 
 
-export default function (req: Request, res: Response, next: NextFunction) {
+export default function (req: Request, res: Response, next: NextFunction): void {
 	try {
 		const authorizationHeader: string | undefined = req.headers.authorization;
 		if (!authorizationHeader)
@@ -16,6 +16,8 @@ export default function (req: Request, res: Response, next: NextFunction) {
 		
 		const tokenService = new TokenService();
 		const userData: JwtTokens.VerifiedJWT = tokenService.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET!);
+
+		req.user = userData;
 		if (!userData)
 			return next(APIError.UnauthorizedError());
 		next();

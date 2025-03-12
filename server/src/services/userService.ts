@@ -104,9 +104,8 @@ class UserService {
 		return new UserDTO(user);
 	}
 
-	async uploadAvatar(avatar: string, accessToken: string): Promise<boolean> {
-		const userData: JwtTokens.VerifiedJWT = this.tokenService.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET!);
-		const user: IUser | null = await User.findOne({ _id: userData.userID });
+	async uploadAvatar(avatar: string, userID: string): Promise<boolean> {
+		const user: IUser | null = await User.findOne({ _id: userID });
 		if (!user) {
 			throw APIError.UnauthorizedError();
 		}

@@ -1,5 +1,6 @@
+import express from "express";
 
-export namespace userNS {
+export declare namespace userNS {
 	interface RegistrationCredentials {
 		email: string,
 		username: string,
@@ -29,11 +30,17 @@ export namespace userNS {
 	}
 }
 
-export namespace JwtTokens {
+export declare namespace JwtTokens {
 	export interface TokenPair {
 		accessToken: string;
 		refreshToken: string;
 	}
-	
+
 	export type VerifiedJWT = string | jwt.JwtPayload | null;
+}
+
+export declare module "express" {
+	export interface Request {
+		user?: JwtTokens.VerifiedJWT;
+	}
 }

@@ -90,8 +90,8 @@ class UserController {
 	async uploadAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const { avatar }: userNS.UserImageBody = req.body;
-			const accessToken: string = req.headers.authorization!.split(" ")[1]!;
-			const status: boolean = await this.userService.uploadAvatar(avatar, accessToken);
+			const userID: string = req.user.userID;
+			const status: boolean = await this.userService.uploadAvatar(avatar, userID);
 			res.json({status});
 			return ;
 		} catch(error: any) {
