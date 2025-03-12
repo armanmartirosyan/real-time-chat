@@ -18,6 +18,7 @@ userRoutes.post("/logout", userController.logout.bind(userController));
 userRoutes.get("/activate/:link", userController.activate.bind(userController));
 userRoutes.get("/refresh", userController.refresh.bind(userController));
 userRoutes.get("/:username", authMiddleware, userController.getUser.bind(userController));
+userRoutes.post("/avatar", authMiddleware, userController.uploadAvatar.bind(userController));
 
 
 

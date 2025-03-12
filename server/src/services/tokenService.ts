@@ -24,12 +24,12 @@ class TokenService {
 	}
 
 	async findToken(refreshToken: string): Promise<ITokens | null> {
-		const token = await Tokens.findOne({ refreshToken });
+		const token: ITokens | null = await Tokens.findOne({ refreshToken });
 		return token;
 	}
 
 	async removeToken(refreshToken: string): Promise<void> {
-		const token = await Tokens.findOne({ refreshToken });
+		const token: ITokens | null = await Tokens.findOne({ refreshToken });
 		if (!token)
 			throw APIError.NoContent("No Content");
 		await token.deleteOne();

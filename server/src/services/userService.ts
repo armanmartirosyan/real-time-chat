@@ -1,7 +1,7 @@
 import * as uuid from "uuid";
 import bcrypt from "bcryptjs";
 import UserDTO from "../dtos/userDTO";
-import User from "../models/UserModel";
+import User, { IUser } from "../models/UserModel";
 import MailService from "./mailService";
 import TokenService from "./tokenService";
 import APIError from "../exceptions/apiError";
@@ -39,7 +39,7 @@ class UserService {
 	}
 
 	async login(email: string, password: string): Promise<userNS.AuthResponseDTO> {
-		const user = await User.findOne({ email });
+		const user: IUser | null = await User.findOne({ email });
 		if (!user)
 			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
 
@@ -63,7 +63,7 @@ class UserService {
 	}
 
 	async activate(activationLink: string): Promise<void> {
-		const user = await User.findOne({ activationLink });
+		const user: IUser | null = await User.findOne({ activationLink });
 		if (!user)
 			throw APIError.BadRequest("Link error", [{ msg: "Incorrect activation link" }]);
 		user.isValid = true;
@@ -80,7 +80,7 @@ class UserService {
 		if (!userData || !isTokenInDB)
 			throw APIError.UnauthorizedError();
 		
-		const user = await User.findOne({ _id: userData.userID });
+		const user: IUser | null = await User.findOne({ _id: userData.userID });
 		if (!user)
 			throw APIError.UnauthorizedError();
 
@@ -98,10 +98,21 @@ class UserService {
 		if (!username)
 			throw APIError.BadRequest("No such user");
 
-		const user = await User.findOne({ username });
+		const user: IUser | null = await User.findOne({ username });
 		if (!user)
 			throw APIError.BadRequest("No such user");
 		return new UserDTO(user);
+	}
+
+	async uploadAvatar(avatar: string, accessToken: string): Promise<boolean> {
+		const userData: JwtTokens.VerifiedJWT = this.tokenService.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET!);
+		const user: IUser | null = await User.findOne({ _id: userData.userID });
+		if (!user) {
+			throw APIError.UnauthorizedError();
+		}
+		user.userImage = avatar;
+		await user.save();
+		return true;	
 	}
 }
 

@@ -16,11 +16,16 @@ export namespace userNS {
 		email: string,
 		username: string,
 		isValid: boolean,
+		userImage?: string,
 	}
 
 	interface AuthResponseDTO {
 		user: IUserDTO,
 		tokenPair: JwtTokens.TokenPair,
+	}
+
+	interface UserImageBody {
+		avatar: string,
 	}
 }
 

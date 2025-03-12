@@ -79,10 +79,22 @@ class UserController {
 	async getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const username: string = req.params.username;
-			const userDTO = await this.userService.getUser(username);
+			const userDTO: userNS.IUserDTO = await this.userService.getUser(username);
 			res.json(userDTO);
 			return ;
 		} catch(error:any) {
+			next(error);
+		}
+	}
+
+	async uploadAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+		try {
+			const { avatar }: userNS.UserImageBody = req.body;
+			const accessToken: string = req.headers.authorization!.split(" ")[1]!;
+			const status: boolean = await this.userService.uploadAvatar(avatar, accessToken);
+			res.json({status});
+			return ;
+		} catch(error: any) {
 			next(error);
 		}
 	}

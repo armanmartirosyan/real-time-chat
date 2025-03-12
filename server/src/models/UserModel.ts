@@ -7,6 +7,7 @@ export interface IUser extends Document {
 	password: string;
 	isValid: boolean;
 	activationLink: string;
+	userImage: string;
 }
 
 const userSchema: Schema<IUser> = new Schema ({
@@ -40,6 +41,10 @@ const userSchema: Schema<IUser> = new Schema ({
 	activationLink: {
 		type: String,
 		required: true,
+	},
+	userImage: {
+		type: String,
+		required: false,
 	}
 
 }, {timestamps: true});
