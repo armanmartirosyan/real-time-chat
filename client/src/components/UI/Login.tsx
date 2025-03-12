@@ -12,15 +12,15 @@ interface LoginProps {
 export default function Login(props: LoginProps): React.JSX.Element {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const user: UserContextType = useContext(UserContext);
+  const userContext: UserContextType = useContext(UserContext);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
     handler(e.target.value);
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit (e: React.FormEvent<HTMLFormElement>): Promise<void>  {
     e.preventDefault();
-    await user.login(email, password);
+    await userContext.login(email, password);
   }
 
   const setAccount = (e: React.MouseEvent<HTMLAnchorElement>): void => {

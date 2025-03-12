@@ -1,6 +1,7 @@
 export interface IUserDTO {
     email: string,
     username: string,
+	userImage: string,
     isValid: boolean,
 }
 
