@@ -3,16 +3,16 @@ import classes from "./Navbar.module.css";
 import { UserContext, UserContextType } from "../../../contexts/userContext";
 
 interface NavbarProps {
-	userImage?: string,
+	setIsInfoPage: React.Dispatch<React.SetStateAction<boolean>>,
 };
 
-const Navbar: React.FC<NavbarProps> = (): React.JSX.Element => {
-	const [isOpen, setIsOpen] = useState(false)
-	const dropdownRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null)
+const Navbar: React.FC<NavbarProps> = ({ setIsInfoPage }: NavbarProps): React.JSX.Element => {
+	const [isOpen, setIsOpen] = useState(false);
+	const dropdownRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
 	const userContext: UserContextType = useContext(UserContext);
 
 	function toggleDropdown(): void {
-		setIsOpen(!isOpen)
+		setIsOpen(!isOpen);
 	}
 
 	function getUserInitials(): string {
@@ -21,32 +21,26 @@ const Navbar: React.FC<NavbarProps> = (): React.JSX.Element => {
 			.map((name: string): string => name[0])
 			.join("")
 			.toUpperCase()
-			.substring(0, 2)
+			.substring(0, 2);
 	}
 
-	useEffect(() => {
+	useEffect((): () => void => {
 		function handleClickOutside (event: MouseEvent): void {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false)
+				setIsOpen(false);
 			}
 		}
 
-		document.addEventListener("mousedown", handleClickOutside)
+		document.addEventListener("mousedown", handleClickOutside);
 		return (): void => {
-			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener("mousedown", handleClickOutside);
 		}
-	}, [])
+	}, []);
 
 	function handleKeyDown (e: React.KeyboardEvent): void {
 		if (e.key === "Escape") {
-			setIsOpen(false)
+			setIsOpen(false);
 		}
-	}
-
-	async function logoutHandler(e: React.FormEvent<HTMLButtonElement>): Promise<void> {
-		e.preventDefault();
-		await userContext.logout();
-		console.log("Logout");
 	}
 
 	return (
@@ -73,13 +67,19 @@ const Navbar: React.FC<NavbarProps> = (): React.JSX.Element => {
 							<div className={classes["dropdown-menu"]}>
 								<button
 									className={classes["dropdown-item"]}
-									onClick={(): void => {}}
+									onClick={(): void => setIsInfoPage(false)}
+								>
+									<span>Home</span>
+								</button>
+								<button
+									className={classes["dropdown-item"]}
+									onClick={(): void => setIsInfoPage(true)}
 								>
 									<span>Personal Info</span>
 								</button>
 								<button
 									className={classes["dropdown-item"]}
-									onClick={logoutHandler}
+									onClick={(): Promise<void> => userContext.logout()}
 								>
 									<span>Logout</span>
 								</button>
@@ -89,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = (): React.JSX.Element => {
 				</li>
 			</ul>
 		</nav>
-	)
+	);
 }
 
 export default Navbar;

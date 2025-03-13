@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
 import "../../@types/index.d";
 import InputBox from "./InputBox/InputBox";
 import classes from "./InputBox/InputBox.module.css"
-import AccountCheck from "./AccountCheck/AccountCheck";
 import { UserContext, UserContextType} from "../../contexts/userContext";
 
 interface SignupProps {
@@ -17,16 +16,16 @@ export default function Signup(props: SignupProps): React.JSX.Element {
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
   const user: UserContextType= useContext(UserContext);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void => {
+  function handleInputChange (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void {
     handler(e.target.value);
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit (e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     await user.registration(email, username, password, passwordConfirm);
   }
 
-  const setAccount = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+  function setAccount (e: React.MouseEvent<HTMLAnchorElement>): void {
     e.preventDefault();
     props.setIsLoginPage(!props.isLoginPage);
   }
@@ -41,7 +40,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               type="username"
               required
               value={username}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setUsername)}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setUsername)}
               placeholder=" "
               autoComplete="username"
               label="Username" />
@@ -49,7 +48,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               type="email"
               required
               value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(e, setEmail)}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setEmail)}
               placeholder=" "
               autoComplete="email"
               label="Email" />
@@ -57,7 +56,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               type="password"
               required
               value={password}
-              onChange={(e) => handleInputChange(e, setPassword)}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setPassword)}
               placeholder=" "
               autoComplete="current-password"
               label="Password" />
@@ -65,7 +64,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
               type="password"
               required
               value={passwordConfirm}
-              onChange={(e) => handleInputChange(e, setPasswordConfirm)}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setPasswordConfirm)}
               placeholder=" "
               autoComplete="current-password"
               label="Confirm Password" />
