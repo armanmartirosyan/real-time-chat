@@ -1,7 +1,7 @@
-import "../../@types/index.d";
+import "../@types/index.d";
 import Navbar from "./Navbar/Navbar";
 import React, { useState, useContext } from "react";
-import { UserContext, UserContextType } from "../../contexts/userContext";
+import { UserContext, UserContextType } from "../contexts/userContext";
 
 export default function MainPage(): React.JSX.Element {
 	const { user, isLoading } = useContext<UserContextType>(UserContext);

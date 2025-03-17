@@ -1,6 +1,6 @@
-import Login from "./components/UI/Login";
-import Signup from "./components/UI/Signup";
-import MainPage from "./components/UI/mainPage";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import MainPage from "./components/MainPage";
 import React, { useContext, useState } from "react";
 import { UserContext, UserContextType } from "./contexts/userContext";
 import "./index.css";

@@ -1,6 +1,6 @@
 import React, { RefObject, useRef, useEffect, useState, useContext } from "react";
 import classes from "./Navbar.module.css";
-import { UserContext, UserContextType } from "../../../contexts/userContext";
+import { UserContext, UserContextType } from "../../contexts/userContext";
 
 interface NavbarProps {
 	setIsInfoPage: React.Dispatch<React.SetStateAction<boolean>>,

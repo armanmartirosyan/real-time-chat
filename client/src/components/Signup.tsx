@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useContext, useState } from "react";
-import "../../@types/index.d";
+import "../@types/index.d";
 import InputBox from "./InputBox/InputBox";
 import classes from "./InputBox/InputBox.module.css"
-import { UserContext, UserContextType} from "../../contexts/userContext";
+import { UserContext, UserContextType} from "../contexts/userContext";
 
 interface SignupProps {
   isLoginPage: boolean;
