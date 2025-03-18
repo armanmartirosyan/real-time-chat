@@ -1,16 +1,17 @@
 import React, { Context, useEffect, createContext, useState, ReactNode } from 'react';
 import AuthService from '../services/AuthService';
-import { IUserDTO, AuthResponseDTO } from '../@types';
+import { IUserDTO, AuthResponseDTO, IUserFormData, ApiResponse } from '../@types';
 import { AxiosResponse } from "axios";
 
 export interface UserContextType {
-	user: IUserDTO | null;
+	user: IUserDTO;
 	setUser: React.Dispatch<React.SetStateAction<IUserDTO>>;
 	isAuth: boolean;
 	setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
 	isLoading: boolean;
 	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	registration: (email: string, username: string, password: string, passwordConfirm: string) => Promise<void>;
+	updateUser(user: IUserFormData): Promise<ApiResponse>;
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	checkAuth(): Promise<void>;
@@ -42,6 +43,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			setUser(response.data.user);
 		} catch (error: any) {
 			console.error(error.response?.data?.message);
+		}
+	}
+
+	async function updateUser(user: IUserFormData): Promise<ApiResponse> {
+		try {
+			const response: AxiosResponse<ApiResponse, any> = await AuthService.updateUser(user);
+
+			return response.data;
+		} catch (error: any) {
+			console.error(error.response?.data?.message);
+			return error.response;
 		}
 	}
 
@@ -87,6 +99,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		setIsLoading,
 		registration,
 		login,
+		updateUser,
 		logout,
 		checkAuth,
 	};

@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsInfoPage }: NavbarProps): React.JS
 	}
 
 	function getUserInitials(): string {
-		return userContext.user!.username
+		return userContext.user.username
 			.split(" ")
 			.map((name: string): string => name[0])
 			.join("")
@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsInfoPage }: NavbarProps): React.JS
 	}
 
 	useEffect((): () => void => {
-		function handleClickOutside (event: MouseEvent): void {
+		function handleClickOutside(event: MouseEvent): void {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
 				setIsOpen(false);
 			}
@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ setIsInfoPage }: NavbarProps): React.JS
 		}
 	}, []);
 
-	function handleKeyDown (e: React.KeyboardEvent): void {
+	function handleKeyDown(e: React.KeyboardEvent): void {
 		if (e.key === "Escape") {
 			setIsOpen(false);
 		}
@@ -55,11 +55,10 @@ const Navbar: React.FC<NavbarProps> = ({ setIsInfoPage }: NavbarProps): React.JS
 							aria-expanded={isOpen}
 						>
 							<div className={classes["user-avatar"]}>
-								{userContext.user!.userImage ? (
-									<img src={userContext.user!.userImage} alt={userContext.user!.username} />
-								) : (
-									<span>{getUserInitials()}</span>
-								)}
+								<img
+									src={userContext.user.userImage || "https://static.vecteezy.com/system/resources/thumbnails/004/511/281/small_2x/default-avatar-photo-placeholder-profile-picture-vector.jpg"}
+									alt={userContext.user.username}
+								/>
 							</div>
 							<span>{userContext.user!.username}</span>
 						</button>

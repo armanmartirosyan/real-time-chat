@@ -14,7 +14,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
-  const user: UserContextType= useContext(UserContext);
+  const userContext: UserContextType = useContext<UserContextType>(UserContext);
 
   function handleInputChange (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void {
     handler(e.target.value);
@@ -22,7 +22,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
 
   async function handleSubmit (e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    await user.registration(email, username, password, passwordConfirm);
+    await userContext.registration(email, username, password, passwordConfirm);
   }
 
   function setAccount (e: React.MouseEvent<HTMLAnchorElement>): void {

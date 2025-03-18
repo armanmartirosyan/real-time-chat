@@ -1,6 +1,6 @@
 import $api from "../http/index";
 import { AxiosResponse } from "axios";
-import { AuthResponseDTO } from "../@types/index.d";
+import { ApiResponse, AuthResponseDTO, IUserFormData } from "../@types/index.d";
 
 export default class AuthService {
 	static async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<AxiosResponse<AuthResponseDTO>> {
@@ -17,5 +17,9 @@ export default class AuthService {
 
 	static async logout(): Promise<AxiosResponse<void>> {
 		return $api.post<void>("/api/user/logout");
+	}
+
+	static async updateUser(user: IUserFormData): Promise<AxiosResponse<ApiResponse, any>> {
+		return $api.patch<ApiResponse>("/api/user/update", user);
 	}
 }

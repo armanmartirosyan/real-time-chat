@@ -12,7 +12,7 @@ interface LoginProps {
 export default function Login({ isLoginPage, setIsLoginPage }: LoginProps): React.JSX.Element {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const userContext: UserContextType = useContext(UserContext);
+	const userContext: UserContextType = useContext<UserContextType>(UserContext);
 
 	function handleInputChange (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void {
 		handler(e.target.value);
