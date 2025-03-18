@@ -1,4 +1,4 @@
-class APIError extends Error{
+class APIError extends Error {
 	status: number;
 	message: string;
 	errors: any;

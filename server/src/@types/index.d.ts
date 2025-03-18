@@ -28,6 +28,14 @@ export declare namespace userNS {
 	interface UserImageBody {
 		avatar: string,
 	}
+
+	interface UserFormData {
+		username: string,
+		email: string,
+		currentPassword: string,
+		newPassword: string,
+		confirmPassword: string,
+	}
 }
 
 export declare namespace JwtTokens {
@@ -37,6 +45,19 @@ export declare namespace JwtTokens {
 	}
 
 	export type VerifiedJWT = string | jwt.JwtPayload | null;
+}
+
+export declare namespace ApiNS {
+	export type ApiError = {
+		field: "username" | "email" | "currentPassword" | "newPassword" | "general",
+		message: string,
+	}
+
+	export interface ApiResponse {
+		success: boolean,
+		errors?: ApiError[],
+	}
+
 }
 
 export declare module "express" {

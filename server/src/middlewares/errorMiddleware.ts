@@ -4,9 +4,9 @@ import MailError from "../exceptions/mailError";
 import { NextFunction, Request, Response } from "express";
 import { writeToErrorFile } from "../helpers/writeToFile";
 
-export default function(err: Error, req: Request, res: Response, next: NextFunction): void {
+export default function (err: Error, req: Request, res: Response, next: NextFunction): void {
 	if (err instanceof mongoose.Error.ValidationError) {
-		res.status(400).json({message: err.message, errors: err.errors});
+		res.status(400).json({ message: err.message, errors: err.errors });
 		return;
 	}
 	if (err instanceof mongoose.mongo.MongoServerError) {
@@ -23,6 +23,6 @@ export default function(err: Error, req: Request, res: Response, next: NextFunct
 		return;
 	}
 	writeToErrorFile(err, "Unexpected Error");
-	res.status(500).json({ message: "Unexpected error."});
+	res.status(500).json({ message: "Unexpected error." });
 	return;
 }

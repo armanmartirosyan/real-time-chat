@@ -19,7 +19,7 @@ userRoutes.get("/activate/:link", userController.activate.bind(userController));
 userRoutes.get("/refresh", userController.refresh.bind(userController));
 userRoutes.get("/:username", authMiddleware, userController.getUser.bind(userController));
 userRoutes.post("/avatar", authMiddleware, userController.uploadAvatar.bind(userController));
-
+userRoutes.patch("/update", authMiddleware, userController.updateUser.bind(userController));
 
 
 export default userRoutes;
