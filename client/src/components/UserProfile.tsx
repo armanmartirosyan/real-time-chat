@@ -25,7 +25,6 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 		newPassword: "",
 		confirmPassword: "",
 	});
-	const [apiErrors, setApiErrors] = useState<ApiError[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const [generalError, setGeneralError] = useState<string>("");
 
@@ -42,11 +41,6 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 				...prev,
 				[name]: "",
 			}));
-		}
-
-		// Clear API errors for this field when user types
-		if (apiErrors.some((err: ApiError): boolean => err.field === name)) {
-			setApiErrors((prev: ApiError[]): ApiError[] => prev.filter((err: ApiError): boolean => err.field !== name))
 		}
 
 		// Clear general error when user makes any change
@@ -94,7 +88,6 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 
 	async function handleSubmit(e: React.FormEvent): Promise<void> {
 		e.preventDefault()
-		setApiErrors([]);
 		setGeneralError("");
 
 		if (!validateForm()) {
@@ -116,7 +109,10 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 					confirmPassword: "",
 				}));
 			} else if (response.errors) {
-				setApiErrors(response.errors);
+				setErrors((prev: IUserFormData): IUserFormData => ({
+					...prev,
+					[response.errors![0].field]: `${response.message}`,
+				}));
 				if (response.errors.length > 0) {
 					const firstErrorField: string = response.errors[0].field;
 					const element: HTMLElement | null = document.getElementById(firstErrorField);
@@ -150,17 +146,12 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 			newPassword: "",
 			confirmPassword: "",
 		});
-		setApiErrors([]);
 		setGeneralError("");
 	}
 
 	function getErrorMessage(field: keyof typeof errors): string {
 		if (errors[field]) {
 			return errors[field];
-		}
-		const apiError: ApiError | undefined = apiErrors.find((err: ApiError): boolean => err.field === field);
-		if (apiError) {
-			return apiError.message;
 		}
 		return "";
 	}

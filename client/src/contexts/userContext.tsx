@@ -49,11 +49,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	async function updateUser(user: IUserFormData): Promise<ApiResponse> {
 		try {
 			const response: AxiosResponse<ApiResponse, any> = await AuthService.updateUser(user);
-
 			return response.data;
 		} catch (error: any) {
 			console.error(error.response?.data?.message);
-			return error.response;
+			return error.response.data;
 		}
 	}
 

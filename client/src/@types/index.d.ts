@@ -21,6 +21,7 @@ export type ApiError = {
 export interface ApiResponse {
 	success: boolean,
 	errors?: ApiError[],
+	message?: string,
 }
 
 export interface TokenPair {
