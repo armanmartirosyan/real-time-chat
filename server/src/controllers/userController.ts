@@ -2,7 +2,6 @@ import { userNS, ApiNS } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
 import UserService from "../services/userService";
 import { Request, Response, NextFunction } from "express";
-import { Result, ValidationError, validationResult } from "express-validator";
 
 class UserController {
 	userService: UserService;

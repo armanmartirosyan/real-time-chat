@@ -1,4 +1,3 @@
-import { body } from "express-validator";
 import { Router, Request, Response, NextFunction } from "express";
 import UserController from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddleware";
