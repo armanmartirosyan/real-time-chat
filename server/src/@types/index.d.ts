@@ -21,6 +21,7 @@ export declare namespace userNS {
 	}
 
 	interface AuthResponseDTO {
+		success: boolean,
 		user: IUserDTO,
 		tokenPair: JwtTokens.TokenPair,
 	}

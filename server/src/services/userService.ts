@@ -39,6 +39,7 @@ class UserService {
 
 		const userDTO = new UserDTO(user);
 		return {
+			success: true,
 			user: userDTO,
 			tokenPair: tokens,
 		};
@@ -58,6 +59,7 @@ class UserService {
 		const userDTO = new UserDTO(user);
 
 		return {
+			success: true,
 			user: userDTO,
 			tokenPair: tokens,
 		};
@@ -95,6 +97,7 @@ class UserService {
 		const userDTO = new UserDTO(user);
 
 		return {
+			success: true,
 			user: userDTO,
 			tokenPair: tokens,
 		};

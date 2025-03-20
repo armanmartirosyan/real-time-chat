@@ -1,5 +1,6 @@
 class APIError extends Error {
 	status: number;
+	success: boolean;
 	message: string;
 	errors: any;
 
@@ -8,6 +9,7 @@ class APIError extends Error {
 		this.status = status;
 		this.message = message;
 		this.errors = errors;
+		this.success = false;
 	}
 
 	static UnauthorizedError(): APIError {

@@ -14,7 +14,7 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
 		return;
 	}
 	if (err instanceof APIError) {
-		res.status(err.status).json({ message: err.message, errors: err.errors });
+		res.status(err.status).json({ success: err.success, message: err.message, errors: err.errors });
 		return;
 	}
 	if (err instanceof MailError) {
