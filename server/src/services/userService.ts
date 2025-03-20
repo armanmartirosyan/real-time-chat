@@ -138,7 +138,7 @@ class UserService {
 			user.password = await bcrypt.hash(newPassword, 3);
 		}
 		user.username = username;
-		if (user.email !== email) {
+		if (email && user.email !== email) {
 			user.email = email;
 			user.isValid = false;
 			user.activationLink = uuid.v4();
