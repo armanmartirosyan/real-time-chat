@@ -1,7 +1,7 @@
-import React, { Context, useEffect, createContext, useState, ReactNode } from 'react';
+import { AxiosResponse } from "axios";
 import AuthService from '../services/AuthService';
 import { IUserDTO, AuthResponseDTO, IUserFormData, ApiResponse } from '../@types';
-import { AxiosResponse } from "axios";
+import React, { Context, useEffect, createContext, useState, ReactNode } from 'react';
 
 export interface UserContextType {
 	user: IUserDTO;
@@ -10,39 +10,43 @@ export interface UserContextType {
 	setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
 	isLoading: boolean;
 	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	registration: (email: string, username: string, password: string, passwordConfirm: string) => Promise<void>;
+	registration: (email: string, username: string, password: string, passwordConfirm: string) => Promise<ApiResponse>;
+	login: (email: string, password: string) => Promise<ApiResponse>;
 	updateUser(user: IUserFormData): Promise<ApiResponse>;
-	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	checkAuth(): Promise<void>;
 }
 
 export const UserContext: Context<UserContextType> = createContext<UserContextType>({} as UserContextType);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: ReactNode }) => {
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: ReactNode }): ReactNode=> {
 	const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
 	const [isAuth, setIsAuth] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	async function registration(email: string, username: string, password: string, passwordConfirm: string): Promise<void> {
+	async function registration(email: string, username: string, password: string, passwordConfirm: string): Promise<ApiResponse> {
 		try {
 			const response: AxiosResponse<AuthResponseDTO, any> = await AuthService.registration(email, username, password, passwordConfirm);
 			localStorage.setItem("token", response.data.tokenPair.accessToken);
 			setIsAuth(true);
 			setUser(response.data.user);
+			return { success: true };
 		} catch (error: any) {
 			console.error(error.response?.data?.message);
+			return error.response.data;
 		}
 	};
 
-	async function login(email: string, password: string): Promise<void> {
+	async function login(email: string, password: string): Promise<ApiResponse> {
 		try {
 			const response: AxiosResponse<AuthResponseDTO, any> = await AuthService.login(email, password);
 			localStorage.setItem("token", response.data.tokenPair.accessToken);
 			setIsAuth(true);
 			setUser(response.data.user);
+			return { success: true };
 		} catch (error: any) {
 			console.error(error.response?.data?.message);
+			return error.response.data;
 		}
 	}
 

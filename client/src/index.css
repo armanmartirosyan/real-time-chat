@@ -87,6 +87,28 @@ a {
 	font-weight: 600;
 }
 
+.form-submit-btn input:active {
+	opacity: 0.6;
+}
+/* Input Box */
+.input-box {
+	position: relative;
+	width: 100%;
+}
+
+.input-box input {
+	width: 100%;
+	background: #333;
+	border: none;
+	outline: none;
+	padding: 15px 10px;
+	border-radius: 4px;
+	color: #FFF;
+	font-weight: 500;
+	font-size: 1em;
+	margin: 10px;
+}
+
 .form-submit-btn input {
 	background-color: #0F0;
 	color: #000;
@@ -96,8 +118,24 @@ a {
 	font-weight: 600;
 }
 
-.form-submit-btn input:active {
-	opacity: 0.6;
+.input-box label {
+	position: absolute;
+	left: 25px;
+	top: 25px;
+	transition: 0.4s ease all;
+	color: #999;
+	pointer-events: none;
+}
+
+.input-box input:focus + label,
+.input-box input:not(:placeholder-shown) + label {
+	top: 10px;
+	left: 20px;
+	font-size: 0.85em;
+}
+
+.general-error {
+	color: var(--invalid-color);
 }
 
 /* User Profile */

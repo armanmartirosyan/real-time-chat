@@ -29,7 +29,7 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 	const [generalError, setGeneralError] = useState<string>("");
 
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-		const { name, value } = e.target
+		const { name, value } = e.target;
 		setFormData((prev: IUserFormData): IUserFormData => ({
 			...prev,
 			[name]: value,
@@ -105,10 +105,10 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 					newPassword: "",
 					confirmPassword: "",
 				}));
-			} else if (response.errors) {
+			} else if (response.errors && response.errors.length > 0) {
 				setErrors((prev: IUserFormData): IUserFormData => ({
 					...prev,
-					[response.errors![0].field]: `${response.message}`,
+					[response.errors![0].field]: `${response.errors![0].message}`,
 				}));
 				if (response.errors.length > 0) {
 					const firstErrorField: string = response.errors[0].field;
@@ -146,7 +146,7 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 		setGeneralError("");
 	}
 
-	function getErrorMessage(field: keyof typeof errors): string {
+	function getErrorMessage(field: string): string {
 		if (errors[field]) {
 			return errors[field];
 		}
@@ -179,7 +179,7 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 								<span className={`status-dot ${user.isValid ? "valid" : "invalid"}`}></span>
 								<span className="status-text">{user.isValid ? "Active Account" : "Inactive Account"}</span>
 							</div>
-							<button className="edit-button" onClick={() => setIsEditing(true)}>
+							<button className="edit-button" onClick={(): void => setIsEditing(true)}>
 								Edit Profile
 							</button>
 						</>

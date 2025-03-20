@@ -13,8 +13,15 @@ export interface IUserFormData {
 	confirmPassword: string,
 }
 
+export interface IUserCredentials {
+	email: string,
+	password: string,
+	username?: string,
+	passwordConfirm?: string,
+}
+
 export type ApiError = {
-	field: "username" | "email" | "currentPassword" | "newPassword" | "general",
+	field: string,
 	message: string,
 }
 

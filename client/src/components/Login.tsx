@@ -1,7 +1,5 @@
-import React, { ChangeEvent, useContext, useState } from "react";
 import "../@types/index.d";
-import InputBox from "./InputBox/InputBox";
-import classes from "./InputBox/InputBox.module.css";
+import React, { ChangeEvent, useContext, useState } from "react";
 import { UserContext, UserContextType } from "../contexts/userContext";
 
 interface LoginProps {
@@ -14,7 +12,7 @@ export default function Login({ isLoginPage, setIsLoginPage }: LoginProps): Reac
 	const [password, setPassword] = useState<string>('');
 	const userContext: UserContextType = useContext<UserContextType>(UserContext);
 
-	function handleInputChange (e: React.ChangeEvent<HTMLInputElement>, handler: Function): void {
+	function handleInputChange(e: React.ChangeEvent<HTMLInputElement>, handler: Function): void {
 		handler(e.target.value);
 	}
 
@@ -34,27 +32,32 @@ export default function Login({ isLoginPage, setIsLoginPage }: LoginProps): Reac
 				<div className="content">
 					<h2>Sign In</h2>
 					<form className="root-form" onSubmit={handleSubmit}>
-						<InputBox
-							type="email"
-							required
-							value={email}
-							onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setEmail)}
-							placeholder=" "
-							autoComplete="email"
-							label="Email" />
-						<InputBox
-							type="password"
-							required
-							value={password}
-							onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setPassword)}
-							placeholder=" "
-							autoComplete="current-password"
-							label="Password" />
-
+						<div className="input-box">
+							<input
+								type="email"
+								required
+								value={email}
+								onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setEmail)}
+								placeholder=" "
+								autoComplete="email"
+							/>
+							<label>Email</label>
+						</div>
+						<div className="input-box">
+							<input
+								type="password"
+								required
+								value={password}
+								onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setPassword)}
+								placeholder=" "
+								autoComplete="current-password"
+							/>
+							<label>Password</label>
+						</div>
 						<div className="links">
 							<a href="#">Forgot password</a> <a onClick={setAccount}>Sign Up</a>
 						</div>
-						<div className={`${classes["input-box"]} form-submit-btn`}>
+						<div className="input-box form-submit-btn">
 							<input type="submit" value="Login" />
 						</div>
 					</form>
