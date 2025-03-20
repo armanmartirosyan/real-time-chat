@@ -1,7 +1,7 @@
 import { JwtTokens } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
 import TokenService from "../services/tokenService";
-import express, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 
 
 export default function (req: Request, res: Response, next: NextFunction): void {

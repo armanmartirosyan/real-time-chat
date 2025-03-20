@@ -18,8 +18,14 @@ class UserService {
 	}
 
 	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNS.AuthResponseDTO> {
+		const isEmailExist: IUser | null = await User.findOne({ email });
+		if (isEmailExist)
+			throw APIError.BadRequest("Validation Error", [{ field: "email", message: "Email is already taken" }]);
+		const isUsernameExist: IUser | null = await User.findOne({ username });
+		if (isUsernameExist)
+			throw APIError.BadRequest("Validation Error", [{ field: "username", message: "Username is already taken" }]);
 		if (password !== passwordConfirm)
-			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
+			throw APIError.BadRequest("Validation Error", [{ field: "confirmPassword", message: "Passwords do not match" }]);
 		const hashedPassword = await bcrypt.hash(password, 3);
 		const activationLink: string = uuid.v4();
 		const user = new User({ email, username, password: hashedPassword, activationLink });
@@ -41,11 +47,11 @@ class UserService {
 	async login(email: string, password: string): Promise<userNS.AuthResponseDTO> {
 		const user: IUser | null = await User.findOne({ email });
 		if (!user)
-			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
+			throw APIError.BadRequest("Validation Error", [{ field: "general", message: "Invalid username or password" }]);
 
 		const passwordMatch: boolean = await bcrypt.compare(password, user.password);
 		if (!passwordMatch)
-			throw APIError.BadRequest("Validation Error", [{ msg: "Invalid username or password" }]);
+			throw APIError.BadRequest("Validation Error", [{ field: "general", message: "Invalid username or password" }]);
 
 		const tokens: JwtTokens.TokenPair = this.tokenService.generateTokens({ iss: "server", aud: "client", iat: Date.now() / 1000, userID: user._id });
 		await this.tokenService.saveToken(user._id, tokens.refreshToken);
@@ -65,7 +71,7 @@ class UserService {
 	async activate(activationLink: string): Promise<void> {
 		const user: IUser | null = await User.findOne({ activationLink });
 		if (!user)
-			throw APIError.BadRequest("Link error", [{ msg: "Incorrect activation link" }]);
+			throw APIError.BadRequest("Link error", [{ message: "Incorrect activation link" }]);
 		user.isValid = true;
 		await user.save();
 		return;
@@ -118,11 +124,11 @@ class UserService {
 		const { username, email, currentPassword, newPassword, confirmPassword } = userFormData;
 		const isUsernameExist: IUser | null = await User.findOne({ username });
 		if (isUsernameExist && isUsernameExist._id.toString() !== userID)
-			throw APIError.BadRequest("Username is already taken", [{ field: "username" }]);
+			throw APIError.BadRequest("Validation Error", [{ field: "username", message: "Username is already taken" }]);
 
 		const isEmailExist: IUser | null = await User.findOne({ email });
 		if (isEmailExist && isEmailExist._id.toString() !== userID)
-			throw APIError.BadRequest("Email is already taken", [{ field: "email" }]);
+			throw APIError.BadRequest("Validation Error", [{ field: "email", message: "Email is already taken" }]);
 
 		const user: IUser | null = await User.findOne({ _id: userID });
 		if (!user)
@@ -131,9 +137,9 @@ class UserService {
 		if (currentPassword && newPassword && confirmPassword) {
 			const passwordMatch: boolean = await bcrypt.compare(currentPassword, user.password);
 			if (!passwordMatch)
-				throw APIError.BadRequest("Passwords do not match", [{ field: "currentPassword" }]);
+				throw APIError.BadRequest("Validation Error", [{ field: "currentPassword", message: "Passwords do not match" }]);
 			if (newPassword !== confirmPassword)
-				throw APIError.BadRequest("Invalid password", [{ field: "newPassword" }]);
+				throw APIError.BadRequest("Validation Error", [{ field: "newPassword", message: "Passwords do not match" }]);
 
 			user.password = await bcrypt.hash(newPassword, 3);
 		}

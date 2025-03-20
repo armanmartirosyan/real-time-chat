@@ -49,7 +49,7 @@ export declare namespace JwtTokens {
 
 export declare namespace ApiNS {
 	export type ApiError = {
-		field: "username" | "email" | "currentPassword" | "newPassword" | "general",
+		field: string,
 		message: string,
 	}
 

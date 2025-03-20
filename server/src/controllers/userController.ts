@@ -13,9 +13,6 @@ class UserController {
 
 	async registration(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const errors: Result<ValidationError> = validationResult(req);
-			if (!errors.isEmpty())
-				throw APIError.BadRequest("Validaiton Error", errors.array());
 			const { email, username, password, passwordConfirm }: userNS.RegistrationCredentials = req.body;
 			const userData: userNS.AuthResponseDTO = await this.userService.registration(email, username, password, passwordConfirm);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
@@ -28,9 +25,6 @@ class UserController {
 
 	async login(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const errors: Result<ValidationError> = validationResult(req);
-			if (!errors.isEmpty())
-				throw APIError.BadRequest("validation Error", errors.array());
 			const { email, password }: userNS.LoginCredentials = req.body;
 			const userData: userNS.AuthResponseDTO = await this.userService.login(email, password);
 			res.cookie("refreshToken", userData.tokenPair.refreshToken, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
