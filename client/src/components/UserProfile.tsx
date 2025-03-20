@@ -35,7 +35,6 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 			[name]: value,
 		}));
 
-		// Clear error when user types
 		if (errors[name as keyof typeof errors]) {
 			setErrors((prev: IUserFormData): IUserFormData => ({
 				...prev,
@@ -43,13 +42,11 @@ export default function UserProfile({ user }: UserProfileProps): React.JSX.Eleme
 			}));
 		}
 
-		// Clear general error when user makes any change
 		if (generalError) {
 			setGeneralError("");
 		}
 	}
 
-	// Validate form
 	function validateForm(): boolean {
 		let isValid: boolean = true;
 		const newErrors = { ...errors };
