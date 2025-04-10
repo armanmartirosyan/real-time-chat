@@ -10,7 +10,8 @@ import express, { Express, Request, Response } from "express";
 import errorMiddleware from "./middlewares/errorMiddleware";
 
 const app: Express = express();
-const PORT: number = Number(process.env.PORT) || 8080;
+const HTTP_PORT: number = Number(process.env.HTTP_PORT) || 8080;
+const WS_PORT: number = Number(process.env.WS_PORT) || 8081;
 
 loggerSetup(app, process.env.NODE_ENV!);
 
@@ -35,8 +36,8 @@ async function startServer(): Promise<void> {
 				process.exit(1);
 			});
 
-		app.listen(PORT, (): void => {
-			console.log(`${colors.yellow}Server is running on port ${PORT}...${colors.reset}`);
+		app.listen(HTTP_PORT, (): void => {
+			console.log(`${colors.yellow}Server is running on port ${HTTP_PORT}...${colors.reset}`);
 		});
 	} catch (error) {
 		console.error(colors.red, error, colors.reset);

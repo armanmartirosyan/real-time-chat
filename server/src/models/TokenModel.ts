@@ -1,4 +1,4 @@
-import mongoose, {Document, Schema} from "mongoose";
+import mongoose, {Document, Schema, Model} from "mongoose";
 
 export interface ITokens extends Document {
 	_id: mongoose.Schema.Types.ObjectId;
@@ -26,6 +26,6 @@ const tokensSchema: Schema<ITokens> = new Schema({
 }, { timestamps: true });
 
 
-const Tokens = mongoose.model<ITokens>("Tokens", tokensSchema);
+const Tokens: Model<ITokens> = mongoose.model<ITokens>("Tokens", tokensSchema);
 
 export default Tokens;
