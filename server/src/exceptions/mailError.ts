@@ -1,5 +1,6 @@
 class MailError extends Error{
 	status: number;
+	success: boolean;
 	message: string;
 	errors: any;
 
@@ -8,6 +9,7 @@ class MailError extends Error{
 		this.status = status;
 		this.message = message;
 		this.errors = errors;
+		this.success = false;
 	}
 
 	static ActivationMailError(errors: any): MailError {

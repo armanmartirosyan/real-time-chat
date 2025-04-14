@@ -1,4 +1,4 @@
-import { userNS, JwtTokens } from "../@types/index.d";
+import { UserNS, JwtTokens } from "../@types/index.d";
 
 export default class UserDTO {
 	email: string;
@@ -6,7 +6,7 @@ export default class UserDTO {
 	isValid: boolean;
 	userImage?: string;
 
-	constructor(model: userNS.IUserDTO) {
+	constructor(model: UserNS.IUserDTO) {
 		this.email = model.email;
 		this.username = model.username;
 		this.isValid = model.isValid;

@@ -1,6 +1,6 @@
 import express from "express";
 
-export declare namespace userNS {
+export declare namespace UserNS {
 	interface RegistrationCredentials {
 		email: string,
 		username: string,
@@ -40,23 +40,32 @@ export declare namespace userNS {
 }
 
 export declare namespace JwtTokens {
-	export interface TokenPair {
+	interface TokenPair {
 		accessToken: string;
 		refreshToken: string;
 	}
 
-	export type VerifiedJWT = string | jwt.JwtPayload | null;
+	type VerifiedJWT = string | jwt.JwtPayload | null;
 }
 
 export declare namespace ApiNS {
-	export type ApiError = {
+	type ApiError = {
 		field: string,
 		message: string,
 	}
 
-	export interface ApiResponse {
+	interface ApiResponse {
 		success: boolean,
+		data?: any,
 		errors?: ApiError[],
+	}
+
+}
+
+export declare namespace ChatNS {
+	interface createChat {
+		firstId: string;
+		secondId: string;
 	}
 
 }

@@ -6,7 +6,7 @@ import MailService from "./mailService";
 import TokenService from "./tokenService";
 import APIError from "../exceptions/apiError";
 import { ITokens } from "../models/TokenModel";
-import { userNS, JwtTokens, ApiNS } from "../@types/index";
+import { UserNS, JwtTokens, ApiNS } from "../@types/index";
 
 class UserService {
 	tokenService: TokenService;
@@ -17,7 +17,7 @@ class UserService {
 		this.mailService = new MailService();
 	}
 
-	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<userNS.AuthResponseDTO> {
+	async registration(email: string, username: string, password: string, passwordConfirm: string): Promise<UserNS.AuthResponseDTO> {
 		const isEmailExist: IUser | null = await User.findOne({ email });
 		if (isEmailExist)
 			throw APIError.BadRequest("Validation Error", [{ field: "email", message: "Email is already taken" }]);
@@ -45,7 +45,7 @@ class UserService {
 		};
 	}
 
-	async login(email: string, password: string): Promise<userNS.AuthResponseDTO> {
+	async login(email: string, password: string): Promise<UserNS.AuthResponseDTO> {
 		const user: IUser | null = await User.findOne({ email });
 		if (!user)
 			throw APIError.BadRequest("Validation Error", [{ field: "general", message: "Invalid username or password" }]);
@@ -79,7 +79,7 @@ class UserService {
 		return;
 	}
 
-	async refresh(refreshToken: string): Promise<userNS.AuthResponseDTO> {
+	async refresh(refreshToken: string): Promise<UserNS.AuthResponseDTO> {
 		if (!refreshToken)
 			throw APIError.UnauthorizedError();
 
@@ -103,7 +103,7 @@ class UserService {
 		};
 	}
 
-	async getUser(username: string): Promise<userNS.IUserDTO> {
+	async getUser(username: string): Promise<UserNS.IUserDTO> {
 		if (!username)
 			throw APIError.BadRequest("No such user");
 
@@ -123,7 +123,7 @@ class UserService {
 		return true;
 	}
 
-	async updateUser(userFormData: userNS.UserFormData, userID: string): Promise<ApiNS.ApiResponse> {
+	async updateUser(userFormData: UserNS.UserFormData, userID: string): Promise<ApiNS.ApiResponse> {
 		const { username, email, currentPassword, newPassword, confirmPassword } = userFormData;
 		const isUsernameExist: IUser | null = await User.findOne({ username });
 		if (isUsernameExist && isUsernameExist._id.toString() !== userID)

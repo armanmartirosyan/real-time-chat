@@ -1,20 +1,22 @@
-import mongoose, {Document, Schema, Model} from "mongoose";
+import mongoose, { Document, Schema, Model, Types } from "mongoose";
 
 export interface IChat extends Document {
-	_id: mongoose.Schema.Types.ObjectId;
-	members: mongoose.Schema.Types.ObjectId[];
+  members: Types.ObjectId[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const chatSchema: Schema<IChat> = new Schema({
-    _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
+const chatSchema: Schema<IChat> = new Schema(
+  {
+    members: {
+      type: [Schema.Types.ObjectId],
+      required: true,
+      ref: "User",
+      validate: [(val: Types.ObjectId[]) => val.length > 1, "At least two members are required."]
     },
-	members: {
-		type: [mongoose.Schema.Types.ObjectId],
-        required: true
-	},
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 const Chat: Model<IChat> = mongoose.model<IChat>("Chat", chatSchema);
 
