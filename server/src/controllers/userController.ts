@@ -1,4 +1,5 @@
 import { UserNS, ApiNS } from "../@types/index.d";
+import APIError from "../exceptions/apiError";
 import UserService from "../services/userService";
 import { Request, Response, NextFunction } from "express";
 
@@ -82,6 +83,8 @@ class UserController {
 	async uploadAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const { avatar }: UserNS.UserImageBody = req.body;
+			if (!req.user)
+				throw APIError.UnauthorizedError();
 			const userID: string = req.user.userID;
 			const success: boolean = await this.userService.uploadAvatar(avatar, userID);
 			res.status(200).json({ success });
@@ -94,6 +97,8 @@ class UserController {
 	async updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
 			const userFormData: UserNS.UserFormData = req.body;
+			if (!req.user)
+				throw APIError.UnauthorizedError();
 			const userID: string = req.user.userID;
 			const response: ApiNS.ApiResponse = await this.userService.updateUser(userFormData, userID);	
 			res.status(200).json(response);

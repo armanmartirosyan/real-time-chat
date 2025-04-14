@@ -1,4 +1,5 @@
 import express from "express";
+import jwt from "jsonwebtoken";
 
 export declare namespace UserNS {
 	interface RegistrationCredentials {
@@ -40,12 +41,19 @@ export declare namespace UserNS {
 }
 
 export declare namespace JwtTokens {
+	interface JwtPayload extends jwt.JwtPayload{
+		iss: string;
+		aud: string;
+		iat: number;
+		userID: string;
+	}
+
 	interface TokenPair {
 		accessToken: string;
 		refreshToken: string;
 	}
 
-	type VerifiedJWT = string | jwt.JwtPayload | null;
+	type VerifiedJWT = JwtPayload | null;
 }
 
 export declare namespace ApiNS {

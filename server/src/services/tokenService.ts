@@ -38,8 +38,10 @@ class TokenService {
 
 	verifyToken(token: string, secret: string): JwtTokens.VerifiedJWT {
 		try {
-			const userData: JwtTokens.VerifiedJWT = jwt.verify(token, secret);
-			return userData;
+			const userData: JwtPayload | string = jwt.verify(token, secret);
+			if (typeof userData === "string")
+				throw APIError.UnauthorizedError();
+			return userData as JwtTokens.VerifiedJWT;
 		} catch(error: any) {
 			throw APIError.UnauthorizedError();
 		}

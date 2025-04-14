@@ -1,3 +1,4 @@
+import APIError from "../exceptions/apiError";
 import { ChatNS, ApiNS } from "../@types/index.d";
 import ChatService from "../services/chatService";
 import { Request, Response, NextFunction } from "express";
@@ -33,8 +34,13 @@ class ChatController {
 
 	async getChat(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const { fId, sId } = req.query;
-			const chat: ApiNS.ApiResponse = await this.chatService.getChat(fId as string, sId as string);
+			const { sId } = req.query;
+			if (typeof sId !== "string")
+				throw APIError.BadRequest("Invalid query");
+			if (!req.user)
+				throw APIError.UnauthorizedError();
+			const fId: string = req.user.userID;
+			const chat: ApiNS.ApiResponse = await this.chatService.getChat(fId, sId);
 			res.status(200).json(chat);
 			return;	
 		} catch(error: any) {

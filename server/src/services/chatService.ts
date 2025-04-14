@@ -41,7 +41,8 @@ class ChatService {
 		const chat: IChat | null = await Chat.findOne({ members: [fId, sId] })
 			.select("_id members")
 			.populate("members", "username");
-		if (!chat) throw APIError.NoContent("Chat not found");
+		if (!chat)
+			throw APIError.NoContent("Chat not found");
 		return { success: true, data: chat };
 	}
 }
