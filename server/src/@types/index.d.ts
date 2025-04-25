@@ -53,7 +53,7 @@ export declare namespace JwtTokens {
 		refreshToken: string;
 	}
 
-	type VerifiedJWT = JwtPayload | null;
+	type VerifiedJWT = JwtTokens.JwtPayload | null;
 }
 
 export declare namespace ApiNS {
