@@ -7,7 +7,7 @@ export interface IUser extends Document {
 	password: string;
 	isValid: boolean;
 	activationLink: string;
-	userImage: string;
+	userImage?: string;
 }
 
 const userSchema: Schema<IUser> = new Schema ({
@@ -18,7 +18,7 @@ const userSchema: Schema<IUser> = new Schema ({
 		trim: true,
 		validate: {
             validator: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-			message: props => `${props.value} is not a vaild email.`
+			message: props => `${props.value} is not a valid email.`
 		}
 	},
 	username: {
