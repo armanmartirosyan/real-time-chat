@@ -1,14 +1,14 @@
 import "../index.css";
 import React, { ChangeEvent, useContext, useState } from "react";
 import { UserContext, UserContextType } from "../contexts/userContext";
-import { ApiResponse, AuthResponseDTO, IUserCredentials } from "../@types/index.d";
+import { ApiResponse, IUserCredentials } from "../@types/index.d";
 
 interface SignupProps {
 	isLoginPage: boolean;
 	setIsLoginPage: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function Signup(props: SignupProps): React.JSX.Element {
+export default function Signup({ isLoginPage, setIsLoginPage }: SignupProps): React.JSX.Element {
 	const [email, setEmail] = useState<string>('');
 	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
@@ -37,7 +37,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
 	function validateForm(): boolean {
 		let isValid: boolean = true;
 		const newErrors = { ...errors };
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 		if (username.trim().length < 4) {
 			newErrors.username = "Username must be at least 3 characters";
@@ -76,12 +76,12 @@ export default function Signup(props: SignupProps): React.JSX.Element {
 			const response: ApiResponse = await userContext.registration(email, username, password, passwordConfirm);
 
 			if (response.success) {
-				props.setIsLoginPage(true);
+				setIsLoginPage(true);
 			}
 			else if (response.errors && response.errors.length > 0) {
 				setGeneralError(response.errors[0].message || "Registration failed. Please try again later.");
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
 			setGeneralError("An error occurred. Please try again later.");
 		} finally {
@@ -98,7 +98,7 @@ export default function Signup(props: SignupProps): React.JSX.Element {
 
 	function setAccount(e: React.MouseEvent<HTMLAnchorElement>): void {
 		e.preventDefault();
-		props.setIsLoginPage(!props.isLoginPage);
+		setIsLoginPage(!isLoginPage);
 	}
 
 	function getErrorMessage(field: string): string {
