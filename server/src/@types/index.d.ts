@@ -76,7 +76,13 @@ export declare namespace ChatNS {
 		secondId: string;
 	}
 
+	interface createMessage {
+		chatId: string,
+		userId: string,
+		content: string,
+	}
 }
+
 
 export declare module "express" {
 	export interface Request {
