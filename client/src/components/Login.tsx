@@ -106,6 +106,7 @@ export default function Login({ isLoginPage, setIsLoginPage }: LoginProps): Reac
 								onChange={(e: ChangeEvent<HTMLInputElement>): void => handleInputChange(e, setEmail)}
 								placeholder=" "
 								autoComplete="email"
+								disabled={isSubmitting}
 							/>
 							{getErrorMessage("email") && <p className="error-message">{getErrorMessage("email")}</p>}
 							<label>Email</label>
