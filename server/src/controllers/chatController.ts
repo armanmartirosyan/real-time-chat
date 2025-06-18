@@ -12,9 +12,9 @@ class ChatController {
 
 	async createChat(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const { secondId }: ChatNS.createChat = req.body;
+			const { secondId, chatName }: ChatNS.createChat = req.body;
       const firstId: string = req.user!.userID;
-			const response: ApiNS.ApiResponse = await this.chatService.createChat(firstId, secondId);
+			const response: ApiNS.ApiResponse = await this.chatService.createChat(chatName, firstId, secondId);
 			res.status(200).json(response);
 			return;
 		} catch (error: any) {
