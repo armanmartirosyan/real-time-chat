@@ -45,6 +45,21 @@ class ChatService {
       throw APIError.NoContent("Chat not found");
     return { success: true, data: chat };
   }
+
+  async updateChatName(chatId: string, newName: string): Promise<ApiNS.ApiResponse> {
+    const cleanName = newName.trim();
+    if (!cleanName)
+      throw APIError.BadRequest("Invalid Name for Chat");
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+      throw APIError.BadRequest("Invalid Chat ID");
+    }
+    const chat: IChat | null = await Chat.findById(chatId);
+    if (!chat)
+      throw APIError.BadRequest("Invalid Chat ID");
+    chat.name = cleanName;
+    await chat.save();
+    return { success: true };
+  }
 }
 
 export default ChatService;

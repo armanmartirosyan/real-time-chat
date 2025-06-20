@@ -49,6 +49,20 @@ class ChatController {
 		}
 	}
 
+  async updateChatName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { chatId } = req.params;
+      const { name } = req.body;
+      if (!req.user)
+        throw APIError.UnauthorizedError();
+      const data: ApiNS.ApiResponse = await this.chatService.updateChatName(chatId, name);
+      res.status(200).json(data);
+      return;
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
 }
 
 export default ChatController;
