@@ -28,7 +28,7 @@ class ChatService {
       throw APIError.BadRequest("Invalid User ID");
     }
     const allChats: IChat[] = await Chat.find({ members: userId })
-      .select("_id members")
+      .select("_id name members")
       .populate("members", "username userImage");
     if (!allChats) throw APIError.BadRequest("Chat not found");
     return { success: true, data: allChats };
