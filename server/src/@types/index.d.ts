@@ -1,5 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongoose";
 
 export declare namespace UserNS {
 	interface RegistrationCredentials {
@@ -15,6 +16,7 @@ export declare namespace UserNS {
 	}
 
 	interface IUserDTO {
+    _id: ObjectId,
 		email: string,
 		username: string,
 		isValid: boolean,
