@@ -2,6 +2,7 @@ import "../@types/index.d";
 import Navbar from "./Navbar/Navbar";
 import Chat from "./Chat";
 import UserInfo from "./UserProfile";
+import { ChatProvider } from "../contexts/chatContext";
 import React, { useState, useContext } from "react";
 import { UserContext, UserContextType } from "../contexts/userContext";
 
@@ -14,10 +15,10 @@ export default function MainPage(): React.JSX.Element {
 	}
 
 	return (
-		<>
+		<ChatProvider  currentUser={user}>
 			<Navbar setIsInfoPage={setIsInfoPage} />
 			{isInfoPage ? (<UserInfo user={user} />) : (<Chat />)}
-		</>
+		</ChatProvider>
 
 	);
 }

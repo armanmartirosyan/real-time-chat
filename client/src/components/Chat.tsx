@@ -1,173 +1,67 @@
-import ChatService from "../services/ChatService";
-import { UserContext, UserContextType } from "../contexts/userContext";
-import { IUserDTO, IMessage, IChat, ApiResponse } from "../@types/index.d";
-import React, { useState, useContext, ChangeEvent, useEffect } from "react";
+"use client"
 
+import { UserContext, type UserContextType } from "../contexts/userContext"
+import { useChatContext } from "../contexts/chatContext"
+import type { IUserDTO } from "../@types/index.d"
+import type React from "react"
+import { useEffect, useRef, useContext, type ChangeEvent, type RefObject } from "react"
 
 export default function Chat(): React.JSX.Element {
 	const { user: currentUser }: { user: IUserDTO } = useContext<UserContextType>(UserContext);
-	const [allChats, setAllChats] = useState<IChat[]>([]);
-	const [currentChat, setCurrentChat] = useState<IChat | null>(null);
-	const [messages, setMessages] = useState<IMessage[]>([]);
-	const [inputValue, setInputValue] = useState("");
-	const [editingChatId, setEditingChatId] = useState<string | null>(null);
-	const [editingChatName, setEditingChatName] = useState("");
-	const [editingHeaderChat, setEditingHeaderChat] = useState(false);
-	const [headerChatName, setHeaderChatName] = useState("");
-	const [loadingChats, setLoadingChats] = useState(true);
-	const [loadingMessages, setLoadingMessages] = useState(false);
-	const [sendingMessage, setSendingMessage] = useState(false);
-	const [updatingChatName, setUpdatingChatName] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const messagesEndRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+	const messagesContainerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+	const {
+		allChats,
+		currentChat,
+		messages,
+		inputValue,
+		editingChatId,
+		editingChatName,
+		editingHeaderChat,
+		headerChatName,
+		loadingChats,
+		loadingMessages,
+		sendingMessage,
+		updatingChatName,
+		error,
+		setInputValue,
+		sendMessage,
+		selectChat,
+		startEditingChat,
+		saveEditingChat,
+		cancelEditingChat,
+		startEditingHeaderChat,
+		saveEditingHeaderChat,
+		cancelEditingHeaderChat,
+		setError,
+		setEditingChatName,
+		setHeaderChatName,
+		getUsernameById,
+	} = useChatContext();
+
+	function scrollToBottom(): void {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}
 
 	useEffect(() => {
-		const fetchChats = async () => {
-			if (!currentUser?._id)
-				return;
-
-			try {
-				setLoadingChats(true);
-				setError(null);
-				const response: ApiResponse = await ChatService.getAllChats(currentUser._id);
-				const chats: IChat[] = response.data;
-				setAllChats(chats);
-
-				// Set first chat as current if available
-				if (chats.length > 0 && !currentChat) {
-					setCurrentChat(chats[0]);
-				}
-			} catch (err) {
-				setError(err instanceof Error ? err.message : "Failed to load chats");
-			} finally {
-				setLoadingChats(false);
-			}
-		}
-
-		fetchChats()
-	}, [currentUser]);
+		scrollToBottom();
+	}, [messages]);
 
 	useEffect(() => {
-		const fetchMessages = async () => {
-			if (!currentChat?._id)
-				return;
-
-			try {
-				setLoadingMessages(true);
-				setError(null);
-				const response: ApiResponse = await ChatService.getMessages(currentChat._id);
-				setMessages(response.data);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : "Failed to load messages");
-			} finally {
-				setLoadingMessages(false);
-			}
+		if (currentChat && !loadingMessages) {
+			setTimeout(scrollToBottom, 100);
 		}
-
-		fetchMessages();
-	}, [currentChat]);
+	}, [currentChat, loadingMessages]);
 
 	function formatTime(timestamp: string): string {
 		const date = new Date(timestamp);
 		return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 	}
 
-	async function sendMessage(): Promise<void> {
-		if (!inputValue.trim() || !currentChat?._id || sendingMessage)
-			return;
-
-		try {
-			setSendingMessage(true);
-			setError(null);
-
-			const response = await ChatService.createMessage(currentChat._id, inputValue.trim());
-			setMessages((prev) => [...prev, response.data]);
-			setInputValue("");
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to send message");
-		} finally {
-			setSendingMessage(false);
-		}
-	}
-
 	function handleKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key === "Enter" && !sendingMessage) {
 			sendMessage();
 		}
-	}
-
-	function selectChat(chat: IChat): void {
-		setCurrentChat(chat);
-		setEditingChatId(null);
-		setEditingHeaderChat(false);
-	}
-
-	function startEditingChat(chatId: string, currentName: string): void {
-		setEditingChatId(chatId);
-		setEditingChatName(currentName);
-	}
-
-	async function saveEditingChat(): Promise<void> {
-		if (!editingChatName.trim() || !editingChatId || updatingChatName)
-			return;
-
-		try {
-			setUpdatingChatName(true);
-			setError(null);
-
-			const response: ApiResponse = await ChatService.updateChatName(editingChatId, editingChatName.trim());
-
-			setAllChats((prev) => prev.map((chat) => (chat._id === editingChatId ? response.data : chat)));
-
-			// Update current chat if it's the one being edited
-			if (currentChat?._id === editingChatId) {
-				setCurrentChat(response.data);
-			}
-
-			setEditingChatId(null);
-			setEditingChatName("");
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to update chat name");
-		} finally {
-			setUpdatingChatName(false);
-		}
-	}
-
-	function cancelEditingChat(): void {
-		setEditingChatId(null);
-		setEditingChatName("");
-	}
-
-	function startEditingHeaderChat(): void {
-		if (!currentChat)
-			return;
-		setEditingHeaderChat(true);
-		setHeaderChatName(currentChat.name);
-	}
-
-	async function saveEditingHeaderChat(): Promise<void> {
-		if (!headerChatName.trim() || !currentChat?._id || updatingChatName)
-			return;
-
-		try {
-			setUpdatingChatName(true);
-			setError(null);
-
-			const response: ApiResponse = await ChatService.updateChatName(currentChat._id, headerChatName.trim())
-
-			setAllChats((prev) => prev.map((chat) => (chat._id === currentChat._id ? response.data : chat)));
-			setCurrentChat(response.data);
-			setEditingHeaderChat(false);
-			setHeaderChatName("");
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to update chat name");
-		} finally {
-			setUpdatingChatName(false);
-		}
-	}
-
-	function cancelEditingHeaderChat(): void {
-		setEditingHeaderChat(false);
-		setHeaderChatName("");
 	}
 
 	function handleChatNameKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
@@ -241,8 +135,8 @@ export default function Chat(): React.JSX.Element {
 													<button
 														className="save-button"
 														onClick={(e) => {
-															e.stopPropagation();
-															saveEditingChat();
+															e.stopPropagation()
+															saveEditingChat()
 														}}
 														disabled={updatingChatName}
 													>
@@ -251,8 +145,8 @@ export default function Chat(): React.JSX.Element {
 													<button
 														className="cancel-button"
 														onClick={(e) => {
-															e.stopPropagation();
-															cancelEditingChat();
+															e.stopPropagation()
+															cancelEditingChat()
 														}}
 														disabled={updatingChatName}
 													>
@@ -263,8 +157,8 @@ export default function Chat(): React.JSX.Element {
 												<button
 													className="edit-button"
 													onClick={(e) => {
-														e.stopPropagation();
-														startEditingChat(chat._id, chat.name);
+														e.stopPropagation()
+														startEditingChat(chat._id, chat.name)
 													}}
 													title="Edit chat name"
 												>
@@ -322,26 +216,32 @@ export default function Chat(): React.JSX.Element {
 							</div>
 
 							{/* Messages */}
-							<div className="chat-messages">
+							<div className="chat-messages" ref={messagesContainerRef}>
 								{loadingMessages ? (
 									<div className="loading-message">Loading messages...</div>
 								) : messages.length === 0 ? (
 									<div className="empty-message">No messages yet. Start the conversation!</div>
 								) : (
-									messages.map((message) => {
-										const isCurrentUser = message.userId === currentUser._id;
-										return (
-											<div key={message._id} className={`message-wrapper ${isCurrentUser ? "own" : "other"}`}>
-												<div className="message-info">
-													<span className="message-author">{currentUser.username}</span>
-													<span className="message-timestamp">{formatTime(message.createdAt)}</span>
+									<>
+										{messages.map((message) => {
+											const isCurrentUser = message.userId === currentUser._id
+											const messageAuthor = getUsernameById(message.userId)
+
+											return (
+												<div key={message._id} className={`message-wrapper ${isCurrentUser ? "own" : "other"}`}>
+													<div className="message-info">
+														<span className="message-author">{messageAuthor}</span>
+														<span className="message-timestamp">{formatTime(message.createdAt)}</span>
+													</div>
+													<div className={`message-bubble ${isCurrentUser ? "own" : "other"}`}>
+														<div className="message-text">{message.content}</div>
+													</div>
 												</div>
-												<div className={`message-bubble ${isCurrentUser ? "own" : "other"}`}>
-													<div className="message-text">{message.content}</div>
-												</div>
-											</div>
-										);
-									})
+											)
+										})}
+										{/* Invisible div to scroll to */}
+										<div ref={messagesEndRef} />
+									</>
 								)}
 							</div>
 
@@ -375,9 +275,9 @@ export default function Chat(): React.JSX.Element {
 			{error && (
 				<div className="error-toast">
 					<span>{error}</span>
-					<button onClick={() => setError(null)}>x</button>
+					<button onClick={() => setError(null)}>×</button>
 				</div>
 			)}
 		</div>
-	)
+	);
 }
