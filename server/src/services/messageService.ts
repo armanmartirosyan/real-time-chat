@@ -25,7 +25,6 @@ class MessageService {
     const messages: IMessage[] = await Message.find({ chatId })
       .select("_id userId content createdAt")
       .populate("userId","username")
-      .sort({ createdAt: -1 })
       .limit(20);
     if (!messages) throw APIError.NoContent("Messages not found");
     return { success: true, data: messages };
