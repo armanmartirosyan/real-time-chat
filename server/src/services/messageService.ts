@@ -15,19 +15,24 @@ class MessageService {
       content,
     });
     await message.save();
-    return { success: true };
+    return { success: true, data: message };
   }
 
   async getMessages(chatId: string): Promise<ApiNS.ApiResponse> {
     if (!mongoose.Types.ObjectId.isValid(chatId)) {
       throw APIError.BadRequest("Invalid ID");
     }
-    const messages: IMessage[] = await Message.find({ chatId })
+
+    const messages = await Message.find({ chatId })
       .select("_id userId content createdAt")
-      .populate("userId","username")
-      .limit(20);
-    if (!messages) throw APIError.NoContent("Messages not found");
-    return { success: true, data: messages };
+      .limit(20)
+      .lean();
+
+    if (!messages || messages.length === 0) {
+      throw APIError.NoContent("Messages not found");
+    }
+
+    return { success: true, data: messages};
   }
 
 }

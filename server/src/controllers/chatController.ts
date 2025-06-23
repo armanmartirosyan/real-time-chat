@@ -12,9 +12,9 @@ class ChatController {
 
 	async createChat(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const { secondId, chatName }: ChatNS.createChat = req.body;
+			const { secondUsername, chatName }: ChatNS.createChat = req.body;
       const firstId: string = req.user!.userID;
-			const response: ApiNS.ApiResponse = await this.chatService.createChat(chatName, firstId, secondId);
+			const response: ApiNS.ApiResponse = await this.chatService.createChat(chatName, firstId, secondUsername);
 			res.status(200).json(response);
 			return;
 		} catch (error: any) {
@@ -35,13 +35,13 @@ class ChatController {
 
 	async getChat(req: Request, res: Response, next: NextFunction): Promise<void> {
 		try {
-			const { sId } = req.query;
-			if (typeof sId !== "string")
+			const { sU } = req.query;
+			if (typeof sU !== "string")
 				throw APIError.BadRequest("Invalid query");
 			if (!req.user)
 				throw APIError.UnauthorizedError();
 			const fId: string = req.user.userID;
-			const chat: ApiNS.ApiResponse = await this.chatService.getChat(fId, sId);
+			const chat: ApiNS.ApiResponse = await this.chatService.getChat(fId, sU);
 			res.status(200).json(chat);
 			return;	
 		} catch(error: any) {

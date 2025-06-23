@@ -74,7 +74,7 @@ export declare namespace ApiNS {
 
 export declare namespace ChatNS {
 	interface createChat {
-		secondId: string;
+		secondUsername: string;
     chatName?: string;
 	}
 

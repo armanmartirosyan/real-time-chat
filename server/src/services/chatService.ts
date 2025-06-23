@@ -6,13 +6,12 @@ import { ApiNS } from "../@types/index.d";
 
 class ChatService {
 
-  async createChat(chatName: string | undefined, firstId: string, secondId: string): Promise<ApiNS.ApiResponse> {
-    if (!mongoose.Types.ObjectId.isValid(firstId) || !mongoose.Types.ObjectId.isValid(secondId)) {
-      throw APIError.BadRequest("Invalid User ID");
-    }
-    const users: IUser[] = await User.find({ _id: { $in: [firstId, secondId] } });
-    if (users.length !== 2)
+  async createChat(chatName: string | undefined, firstId: string, secondUsername: string): Promise<ApiNS.ApiResponse> {
+    const secondUser: IUser | null = await User.findOne({ username: secondUsername });
+    if (!secondUser)
       throw APIError.BadRequest("Users not found");
+
+    const secondId: mongoose.Schema.Types.ObjectId = secondUser._id;
     let chat: IChat | null = await Chat.findOne({
       members: { $all: [firstId, secondId] }
     });
@@ -20,7 +19,7 @@ class ChatService {
       chat = new Chat({ name: chatName, members: [firstId, secondId] });
       await chat.save();
     }
-    return { success: true };
+    return { success: true, data: { chatId: chat._id }};
   }
 
   async getAllChats(userId: string): Promise<ApiNS.ApiResponse> {
@@ -34,10 +33,11 @@ class ChatService {
     return { success: true, data: allChats };
   }
 
-  async getChat(fId: string, sId: string): Promise<ApiNS.ApiResponse> {
-    if (!mongoose.Types.ObjectId.isValid(fId) || !mongoose.Types.ObjectId.isValid(sId)) {
-      throw APIError.BadRequest("Invalid User ID");
-    }
+  async getChat(fId: string, sU: string): Promise<ApiNS.ApiResponse> {
+    const secondUser: IUser | null = await User.findOne({ username: sU });
+    if (!secondUser)
+      throw APIError.BadRequest("Users not found");
+    const sId: mongoose.Schema.Types.ObjectId = secondUser._id;
     const chat: IChat | null = await Chat.findOne({ members: [fId, sId] })
       .select("_id members")
       .populate("members", "username userImage");
@@ -58,7 +58,7 @@ class ChatService {
       throw APIError.BadRequest("Invalid Chat ID");
     chat.name = cleanName;
     await chat.save();
-    return { success: true };
+    return { success: true, data: chat };
   }
 }
 
