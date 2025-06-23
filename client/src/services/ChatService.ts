@@ -3,6 +3,11 @@ import { AxiosResponse } from "axios";
 import { ApiResponse } from "../@types/index.d";
 
 export default class ChatService {
+  static async createChat(secondUsername: string, chatName: string = ""): Promise<ApiResponse> {
+    const response: AxiosResponse<ApiResponse, any> = await $api.post<ApiResponse>("/api/chat/create", { secondUsername, chatName});
+    return response.data;
+  }
+
   static async getAllChats(userId: string): Promise<ApiResponse> {
     const response: AxiosResponse<ApiResponse, any> = await $api.get<ApiResponse>(`/api/chat/get/${userId}`);
     return response.data;

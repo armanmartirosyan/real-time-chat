@@ -1,15 +1,16 @@
 "use client"
 
-import { UserContext, type UserContextType } from "../contexts/userContext"
-import { useChatContext } from "../contexts/chatContext"
-import type { IUserDTO } from "../@types/index.d"
-import type React from "react"
-import { useEffect, useRef, useContext, type ChangeEvent, type RefObject } from "react"
+import type React from "react";
+import CreateChatModal from "./CreateChatModal";
+import type { IUserDTO } from "../@types/index.d";
+import { useChatContext } from "../contexts/chatContext";
+import { UserContext, type UserContextType } from "../contexts/userContext";
+import { useEffect, useRef, useContext, type ChangeEvent, type RefObject } from "react";
 
 export default function Chat(): React.JSX.Element {
-	const { user: currentUser }: { user: IUserDTO } = useContext<UserContextType>(UserContext);
-	const messagesEndRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
-	const messagesContainerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+	const { user: currentUser }: { user: IUserDTO } = useContext<UserContextType>(UserContext)
+	const messagesEndRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null)
+	const messagesContainerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null)
 	const {
 		allChats,
 		currentChat,
@@ -37,46 +38,47 @@ export default function Chat(): React.JSX.Element {
 		setEditingChatName,
 		setHeaderChatName,
 		getUsernameById,
-	} = useChatContext();
+		openCreateChatModal,
+	} = useChatContext()
 
 	function scrollToBottom(): void {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
 	}
 
 	useEffect(() => {
-		scrollToBottom();
-	}, [messages]);
+		scrollToBottom()
+	}, [messages])
 
 	useEffect(() => {
 		if (currentChat && !loadingMessages) {
-			setTimeout(scrollToBottom, 100);
+			setTimeout(scrollToBottom, 100)
 		}
-	}, [currentChat, loadingMessages]);
+	}, [currentChat, loadingMessages])
 
 	function formatTime(timestamp: string): string {
-		const date = new Date(timestamp);
-		return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+		const date = new Date(timestamp)
+		return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 	}
 
 	function handleKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key === "Enter" && !sendingMessage) {
-			sendMessage();
+			sendMessage()
 		}
 	}
 
 	function handleChatNameKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key === "Enter") {
-			saveEditingChat();
+			saveEditingChat()
 		} else if (e.key === "Escape") {
-			cancelEditingChat();
+			cancelEditingChat()
 		}
 	}
 
 	function handleHeaderChatNameKeyPress(e: React.KeyboardEvent<HTMLInputElement>): void {
 		if (e.key === "Enter") {
-			saveEditingHeaderChat();
+			saveEditingHeaderChat()
 		} else if (e.key === "Escape") {
-			cancelEditingHeaderChat();
+			cancelEditingHeaderChat()
 		}
 	}
 
@@ -85,7 +87,7 @@ export default function Chat(): React.JSX.Element {
 			<div className="chat-container">
 				<div className="error-message">Please log in to access the chat.</div>
 			</div>
-		);
+		)
 	}
 
 	return (
@@ -95,13 +97,21 @@ export default function Chat(): React.JSX.Element {
 				<div className="chat-sidebar">
 					<div className="chat-sidebar-header">
 						<h2 className="chat-sidebar-title">Chats</h2>
+						<button className="create-chat-button" onClick={openCreateChatModal} title="Create new chat">
+							+
+						</button>
 					</div>
 
 					<div className="chat-list">
 						{loadingChats ? (
 							<div className="loading-message">Loading chats...</div>
 						) : allChats.length === 0 ? (
-							<div className="empty-message">No chats available</div>
+							<div className="empty-message">
+								<p>No chats available</p>
+								<button className="create-first-chat-button" onClick={openCreateChatModal}>
+									Create your first chat
+								</button>
+							</div>
 						) : (
 							allChats.map((chat) => (
 								<div
@@ -265,11 +275,19 @@ export default function Chat(): React.JSX.Element {
 						</>
 					) : (
 						<div className="no-chat-selected">
-							<div className="empty-message">Select a chat to start messaging</div>
+							<div className="empty-message">
+								Select a chat to start messaging or{" "}
+								<button className="create-chat-link" onClick={openCreateChatModal}>
+									create a new chat
+								</button>
+							</div>
 						</div>
 					)}
 				</div>
 			</div>
+
+			{/* Create Chat Modal */}
+			<CreateChatModal />
 
 			{/* Error Display */}
 			{error && (
@@ -279,5 +297,5 @@ export default function Chat(): React.JSX.Element {
 				</div>
 			)}
 		</div>
-	);
+	)
 }

@@ -19,6 +19,8 @@ export interface ChatContextType {
 	loadingMessages: boolean;
 	sendingMessage: boolean;
 	updatingChatName: boolean;
+	creatingChat: boolean;
+	showCreateChatModal: boolean;
 	error: string | null;
 
 	// Actions
@@ -36,6 +38,9 @@ export interface ChatContextType {
 	setEditingChatName: (value: string) => void;
 	setHeaderChatName: (value: string) => void;
 	getUsernameById: (userId: string) => string;
+	openCreateChatModal: () => void;
+	closeCreateChatModal: () => void;
+	createChat: (secondUsername: string, chatName?: string) => Promise<void>;
 }
 
 const ChatContext: Context<ChatContextType | null> = createContext<ChatContextType | null>(null);
@@ -67,6 +72,16 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	const [sendingMessage, setSendingMessage] = useState(false);
 	const [updatingChatName, setUpdatingChatName] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [creatingChat, setCreatingChat] = useState(false);
+	const [showCreateChatModal, setShowCreateChatModal] = useState(false);
+
+	function openCreateChatModal(): void {
+		setShowCreateChatModal(true);
+	}
+
+	function closeCreateChatModal(): void {
+		setShowCreateChatModal(false);
+	}
 
 	async function fetchChats(): Promise<void> {
 		if (!currentUser?._id) return;
@@ -207,6 +222,36 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 		const member = currentChat?.members.find((member) => member._id === userId);
 		return member?.username || "Unknown User";
 	}
+
+	async function createChat(secondUsername: string, chatName?: string): Promise<void> {
+		if (!secondUsername.trim() || creatingChat) return;
+
+		try {
+			setCreatingChat(true);
+			setError(null);
+
+			secondUsername = secondUsername.trim();
+			if (chatName)
+				chatName = chatName.trim();
+			if (!chatName)
+				chatName = "Awesom Chat";
+
+			const response: ApiResponse = await ChatService.createChat(secondUsername, chatName);
+			const newChat: IChat = response.data;
+			setAllChats((prev) => {
+				const exists = prev.some((chat) => chat._id === newChat._id);
+				if (exists) return prev;
+				return [newChat, ...prev];
+			});
+			setCurrentChat(newChat);
+			setShowCreateChatModal(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to create chat");
+		} finally {
+			setCreatingChat(false);
+		}
+	}
+
 	useEffect(() => {
 		fetchChats();
 	}, [currentUser]);
@@ -229,6 +274,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 		loadingMessages,
 		sendingMessage,
 		updatingChatName,
+		creatingChat,
+		showCreateChatModal,
 		error,
 
 		// Actions
@@ -246,6 +293,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 		setEditingChatName,
 		setHeaderChatName,
 		getUsernameById,
+		openCreateChatModal,
+		closeCreateChatModal,
+		createChat,
 	}
 
 	return <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>;
