@@ -19,7 +19,7 @@ class ChatService {
       chat = new Chat({ name: chatName, members: [firstId, secondId] });
       await chat.save();
     }
-    return { success: true, data: { chatId: chat._id }};
+    return { success: true, data: chat };
   }
 
   async getAllChats(userId: string): Promise<ApiNS.ApiResponse> {
