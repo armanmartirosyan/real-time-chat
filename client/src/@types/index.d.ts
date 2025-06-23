@@ -1,4 +1,5 @@
 export interface IUserDTO {
+  _id: string,
 	email: string,
 	username: string,
 	userImage: string,
@@ -27,6 +28,7 @@ export type ApiError = {
 
 export interface ApiResponse {
 	success: boolean,
+  data?: any,
 	errors?: ApiError[],
 	message?: string,
 }
@@ -39,4 +41,21 @@ export interface TokenPair {
 export interface AuthResponseDTO {
 	user: IUserDTO,
 	tokenPair: TokenPair,
+}
+
+export interface IChat {
+	_id: string;
+	name: string;
+	members: {
+		_id: string;
+		username: string;
+		userImage?: string;
+	}[];
+}
+
+export interface IMessage {
+	_id: string;
+	userId: string;
+  content: string;
+	createdAt: string;
 }
