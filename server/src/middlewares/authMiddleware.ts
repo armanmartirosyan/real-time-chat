@@ -15,7 +15,7 @@ export default function (req: Request, res: Response, next: NextFunction): void 
 			return next(APIError.UnauthorizedError());
 		
 		const tokenService = new TokenService();
-		const userData: JwtTokens.VerifiedJWT = tokenService.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET!);
+		const userData: JwtTokens.VerifiedJWT = tokenService.verifyToken(accessToken);
 
 		Object.defineProperty(req, "user", {
 			value: userData,

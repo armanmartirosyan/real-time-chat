@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import mongoose from "mongoose";
 import Tokens, {ITokens } from "../models/TokenModel";
 import jwt, {JwtPayload} from "jsonwebtoken";
@@ -5,9 +7,17 @@ import { JwtTokens } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
 
 class TokenService {
+  private privateKey: string;
+  private publicKey: string;
+
+  constructor() {
+    this.privateKey = fs.readFileSync(path.join(__dirname, "../certificates/private.pem"), 'utf-8');
+    this.publicKey = fs.readFileSync(path.join(__dirname, "../certificates/public.pem"), 'utf-8');
+  }
+
 	generateTokens(payload: JwtPayload): JwtTokens.TokenPair {
-		const accessToken: string = jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {expiresIn: "30m"});
-		const refreshToken: string = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {expiresIn: "1d"});
+    const accessToken: string = jwt.sign(payload, this.privateKey, { algorithm: 'RS256', expiresIn: '1h' });
+    const refreshToken: string = jwt.sign(payload, this.privateKey, { algorithm: 'RS256', expiresIn: '1d' });
 		
 		return {accessToken, refreshToken};
 	}
@@ -36,9 +46,9 @@ class TokenService {
 		return ;
 	}
 
-	verifyToken(token: string, secret: string): JwtTokens.VerifiedJWT {
+	verifyToken(token: string): JwtTokens.VerifiedJWT {
 		try {
-			const userData: JwtPayload | string = jwt.verify(token, secret);
+			const userData: JwtPayload | string = jwt.verify(token, this.publicKey, { algorithms: ['RS256'] });
 			if (typeof userData === "string")
 				throw APIError.UnauthorizedError();
 			return userData as JwtTokens.VerifiedJWT;

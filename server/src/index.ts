@@ -6,12 +6,11 @@ import router from "./routes/routes";
 import colors from "./helpers/colors";
 import cookieParser from "cookie-parser";
 import { loggerSetup } from "./helpers/loggerSetup";
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import errorMiddleware from "./middlewares/errorMiddleware";
 
 const app: Express = express();
 const HTTP_PORT: number = Number(process.env.HTTP_PORT) || 8080;
-const WS_PORT: number = Number(process.env.WS_PORT) || 8081;
 
 loggerSetup(app, process.env.NODE_ENV!);
 

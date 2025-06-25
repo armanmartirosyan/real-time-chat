@@ -83,7 +83,7 @@ class UserService {
 		if (!refreshToken)
 			throw APIError.UnauthorizedError();
 
-		const userData: JwtTokens.VerifiedJWT = this.tokenService.verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET!);
+		const userData: JwtTokens.VerifiedJWT = this.tokenService.verifyToken(refreshToken);
 		const isTokenInDB: ITokens | null = await this.tokenService.findToken(refreshToken);
 		if (!userData || !isTokenInDB)
 			throw APIError.UnauthorizedError();
