@@ -1,19 +1,19 @@
-import dotenv from "dotenv";
-dotenv.config();
-import { IncomingMessage } from "http";
-import { WebSocketServer, WebSocket } from "ws";
-
-const WS_PORT: number = Number(process.env.WS_PORT) || 8081;
-const wss = new WebSocketServer({ port: WS_PORT, noServer: true });
-
-type ClientMessage = {
-  _id: string;
-  chatId: string;
-  userId: string;
-  content: string;
-};
+import App from './app';
 
 
-wss.on("connection", async (ws: WebSocket, req: IncomingMessage ): Promise<void> => {
-  console.log("New connection", ws, req);
+const app = new App();
+
+app.startup();
+
+process.on('uncaughtException', (e: Error) => {
+  console.error(e);
+});
+
+process.on('unhandledRejection', (e: Error) => {
+  console.error(e);
+});
+
+process.on('exit', () => {
+  console.error('Exit event is called');
+  process.exit(1);
 });
