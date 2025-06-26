@@ -12,3 +12,4 @@ if (env.error) {
 export const WS_PORT: number = Number(process.env.WS_PORT) || 8081;
 export const WS_HOST: string = process.env.WS_HOST || '0.0.0.0';
 export const ALLOWED_ORIGINS: string[] = process.env.ALLOWED_ORIGINS?.split(',') || ["*"];
+export const REST_API_URL: string = process.env.REST_API_URL || "http://localhost:8080";

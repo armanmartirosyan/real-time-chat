@@ -1,38 +1,22 @@
-import { WS_PORT, WS_HOST, ALLOWED_ORIGINS } from "./envConfig";
-import { IVerifyClient, VerifiedJWT, VerifyClientDone } from "./types";
+import { WS_PORT, WS_HOST, ALLOWED_ORIGINS, REST_API_URL } from "./envConfig";
 import http, { IncomingMessage, Server } from "http";
-import { WebSocketServer, WebSocket, RawData, MessageEvent, Event } from "ws";
+import { WebSocketServer, WebSocket, RawData } from "ws";
+import { IVerifyClient, VerifiedJWT, VerifyClientDone, ClientMessage } from "./types";
 import TokenService from "./services/tokenService";
-import { JwtPayload } from "jsonwebtoken";
 import ServiceError from "./exceptions/serviceError";
-import { Socket } from "node:net";
-
-// wss.on("connection", async (ws: WebSocket, req: IncomingMessage): Promise<void> => {
-//   ws.onopen = (event: Event ) => {
-//     wss.clients.forEach((client) => {
-//         client.send(`New User just joined. Everyone greet`);
-//     });
-//   }
-// ws.on("message", (message: RawData, isBinary: boolean) => {
-//   console.log(message.toString(), ws.);
-// });
-//   ws.onmessage = (event: MessageEvent) => {
-//     wss.clients.forEach((client) => {
-//       if (client !== ws && client.readyState === WebSocket.OPEN)
-//         client.send(event.data);
-//     });
-//   };
-// });
-
-// server.listen(WS_PORT, "0.0.0.0", () => {
-//   console.log(`Web Socket Server is listening port ${WS_PORT}`);
-// });
 
 
 class App {
+  readonly HEARTBEAT_VALUE = 1;
+  readonly HEARBEAT_RATE = 30000;
+  readonly PORT = WS_PORT;
+  readonly HOST = WS_HOST;
+  readonly REST_API_URL = REST_API_URL;
+
   private httpServer: Server;
   private wss: WebSocketServer;
   private tokenService: TokenService;
+  private userSocketMap: Map<string, WebSocket>;
 
   constructor() {
     this.httpServer = http.createServer();
@@ -41,6 +25,7 @@ class App {
       verifyClient: this.verifyClient.bind(this),
     });
     this.tokenService = new TokenService();
+    this.userSocketMap = new Map<string, WebSocket>();
   }
 
   private verifyClient(info: IVerifyClient, done: VerifyClientDone): void {
@@ -54,12 +39,14 @@ class App {
     const authHeader: string | undefined = info.req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer "))
       return done(false, 401, "Unauthorised");
+
     const token: string = authHeader.split(" ")[1];
     try {
       const userData: VerifiedJWT = this.tokenService.verifyToken(token);
       if (typeof userData === "string")
         return done(false, 401, "Unauthorised");
       info.req._wsUserData = userData;
+      info.req._wsUserToken = token;
       return done(true);
     } catch (error: any) {
       console.error("Token verification failed");
@@ -70,32 +57,86 @@ class App {
     }
   }
 
-  listen(port: number, host: string): void {
-    this.httpServer.listen(port, host, () => {
-      console.log(`Server is running on port ${port}`);
+  private listen(): void {
+    this.httpServer.listen(this.PORT, this.HOST, () => {
+      console.log(`Server is running on port ${this.PORT}`);
     });
+  }
+
+  private async saveMessage(message: ClientMessage, token: string): Promise<void> {
+    try {
+      const res: Response = await fetch(`${REST_API_URL}/api/msg/create`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+         },
+        body: JSON.stringify(message),
+      });
+
+      console.log(res);
+      if (!res.ok) {
+        console.error(`Failed to save message: ${res.statusText}`);
+      }
+    } catch (err) {
+      console.error("Error sending message to REST API:", err);
+    }
   }
 
   private onConnection(): void {
-    this.wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
-      // ws.ping = (a) => {
+    this.wss.on("connection", async (ws: WebSocket, req: IncomingMessage): Promise<void> => {
+      ws.isAlive = true;
+      this.userSocketMap.set(req._wsUserData!.userID, ws);
 
-      // }
+      ws.on("message", async (rawMessage: RawData) => {
+        try {
+          const message: ClientMessage = JSON.parse(rawMessage.toString());
+          const recipient: WebSocket | undefined = this.userSocketMap.get(message.userId);
+
+          if (recipient && recipient.readyState === WebSocket.OPEN) {
+            recipient.send(JSON.stringify({ from: req._wsUserData!.userID, content: message.content }));
+          }
+
+          await this.saveMessage(message, req._wsUserToken);
+
+        } catch (error: any) {
+          console.error("WS: Invalid message", error);
+        }
+      });
+
+      ws.on("close", () => {
+        this.userSocketMap.delete(req._wsUserData!.userID);
+        console.log(`WS: user ${req._wsUserData!.userID} disconnected`);
+      });
+
+      ws.on("pong", () => {
+        ws.isAlive = true;
+      });
     });
   }
 
-  // private startHeartBeat(interval: number = 30000): void {
-  //   setInterval(() => {
-  //     this.wss.clients.forEach((client) => {
-  //       if (client)
-  //     });
-  //   }, interval);
-  // } 
+  startHeartBeat(): void {
+    setInterval(() => {
+      this.wss.clients.forEach((client) => {
+        const isAlive = Reflect.get(client, "isAlive");
+        if (typeof (isAlive) !== `boolean`)
+          throw new TypeError("Field is Alive does not exist in type WebSocket");
+
+        if (!isAlive) {
+          client.terminate();
+          return;
+        }
+
+        Reflect.set(client, "isAlive", false);
+        client.ping();
+      });
+    }, this.HEARBEAT_RATE);
+  }
 
   public startup(): void {
-    this.listen(WS_PORT, WS_HOST);
     this.onConnection();
-
+    this.startHeartBeat();
+    this.listen();
   }
 }
 
