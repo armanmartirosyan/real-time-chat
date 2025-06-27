@@ -16,6 +16,7 @@ export type VerifyClientDone = (
 ) => void;
 
 export type ClientMessage = {
+  type: string;
   userId: string;
   chatId: string;
   content: string;
