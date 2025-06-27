@@ -5,7 +5,7 @@ import Tokens, { ITokens } from "../models/TokenModel";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JwtTokens } from "../@types/index.d";
 import APIError from "../exceptions/apiError";
-import colors from "../helpers/colors";
+import { PRIVATE_KEY, PUBLIC_KEY } from "../helpers/loadCertificates";
 
 class TokenService {
   private privateKey: string;
@@ -13,11 +13,8 @@ class TokenService {
 
   constructor() {
     try {
-      this.privateKey = fs.readFileSync(path.join(__dirname, "../certificates/private.pem"), 'utf-8');
-      console.log(`${colors.cyan}Private key loaded successfully.${colors.reset}`);
-
-      this.publicKey = fs.readFileSync(path.join(__dirname, "../certificates/public.pem"), 'utf-8');
-      console.log(`${colors.cyan}Public key loaded successfully.${colors.reset}`);
+      this.privateKey = PRIVATE_KEY;
+      this.publicKey = PUBLIC_KEY;
     } catch (error: any) {
       console.error('\n--- CRITICAL ERROR: Failed to load cryptographic certificates ---');
       console.error(`An unexpected error occurred while loading certificates: ${error.message}`);
