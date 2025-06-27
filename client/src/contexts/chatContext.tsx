@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react";
-import { createContext, useContext, useState, useEffect, type ReactNode, Context } from "react";
+import { createContext, useContext, useState, useEffect, useRef, type ReactNode, type Context } from "react";
 import ChatService from "../services/ChatService";
 import type { IUserDTO, IMessage, IChat, ApiResponse } from "../@types/index.d";
 
@@ -22,6 +22,7 @@ export interface ChatContextType {
 	creatingChat: boolean;
 	showCreateChatModal: boolean;
 	error: string | null;
+	wsConnected: boolean;
 
 	// Actions
 	setInputValue: (value: string) => void;
@@ -54,8 +55,8 @@ export function useChatContext(): ChatContextType {
 }
 
 interface ChatProviderProps {
-	children: ReactNode
-	currentUser: IUserDTO
+	children: ReactNode;
+	currentUser: IUserDTO;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUser }) => {
@@ -74,6 +75,178 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	const [error, setError] = useState<string | null>(null);
 	const [creatingChat, setCreatingChat] = useState(false);
 	const [showCreateChatModal, setShowCreateChatModal] = useState(false);
+	const [wsConnected, setWsConnected] = useState(false);
+	const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+	const socketRef = useRef<WebSocket | null>(null);
+
+	function normalizeMessage(messageData: any): IMessage | null {
+		let normalizedMessage: IMessage;
+
+		if (messageData.from && messageData.content) {
+			// Server format: { type: 'message', from: 'userId', chatId: 'chatId', content: 'content' }
+			normalizedMessage = {
+				_id: messageData._id || `ws-${Date.now()}-${Math.random()}`,
+				userId: messageData.from,
+				content: messageData.content,
+				createdAt: messageData.createdAt || new Date().toISOString(),
+			}
+		} else if (messageData._id && messageData.userId && messageData.content) {
+			// Standard format: { _id: 'id', userId: 'userId', content: 'content', createdAt: 'timestamp' }
+			normalizedMessage = messageData;
+		} else {
+			console.warn("Invalid message structure:", messageData);
+			return null;
+		}
+
+		return normalizedMessage;
+	}
+
+	function joinChat(chatId: string): void {
+		if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+			const joinMessage = {
+				type: "join_chat",
+				chatId: chatId,
+				userId: currentUser._id,
+			}
+			socketRef.current.send(JSON.stringify(joinMessage));
+		}
+	}
+
+	function leaveChat(chatId: string): void {
+		if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+			const leaveMessage = {
+				type: "leave_chat",
+				chatId: chatId,
+				userId: currentUser._id,
+			}
+			socketRef.current.send(JSON.stringify(leaveMessage));
+		}
+	}
+
+	function handleIncomingMessage(messageData: any): void {
+
+		const normalizedMessage = normalizeMessage(messageData);
+		if (!normalizedMessage)
+			return;
+
+
+		setMessages((prevMessages) => {
+
+			if (messageData.tempId) {
+				const updatedMessages = prevMessages.map((msg) =>
+					msg._id === messageData.tempId ? { ...normalizedMessage, tempId: undefined } : msg,
+				)
+				return updatedMessages;
+			}
+
+			if (normalizedMessage.userId === currentUser._id) {
+				const now = Date.now();
+				const recentOptimisticMessages = prevMessages.filter(
+					(msg) =>
+						msg._id.startsWith("temp-") &&
+						msg.userId === currentUser._id &&
+						msg.content === normalizedMessage.content &&
+						now - Number.parseInt(msg._id.split("-")[1]) < 5000,
+				)
+
+				if (recentOptimisticMessages.length > 0) {
+					const filteredMessages = prevMessages.filter(
+						(msg) => !recentOptimisticMessages.some((opt) => opt._id === msg._id),
+					)
+					return [...filteredMessages, normalizedMessage];
+				}
+			}
+
+			const exists = prevMessages.some((msg) => msg._id === normalizedMessage._id);
+			if (exists) {
+				return prevMessages;
+			}
+
+			const newMessages = [...prevMessages, normalizedMessage];
+			return newMessages;
+		})
+	}
+
+	useEffect(() => {
+		if (!currentUser?._id)
+			return;
+
+		const currentToken = localStorage.getItem("token");
+		setToken(currentToken);
+
+		if (!currentToken)
+			return;
+
+		const ws = new WebSocket(`ws://localhost:8088?token=${currentToken}`);
+		socketRef.current = ws;
+
+		ws.onopen = () => {
+			setWsConnected(true);
+			setError(null);
+
+			if (currentChat?._id) {
+				joinChat(currentChat._id);
+			}
+		}
+
+		ws.onmessage = (event) => {
+			try {
+				const messageData = JSON.parse(event.data);
+
+				if (messageData.type) {
+					switch (messageData.type) {
+						case "message":
+							handleIncomingMessage(messageData);
+							break;
+
+						case "chat_joined":
+							break;
+
+						case "chat_left":
+							break;
+
+						case "error":
+							console.error("WebSocket error:", messageData.message);
+							setError(messageData.message);
+							break;
+
+						default:
+							break;
+					}
+				} else {
+					handleIncomingMessage(messageData);
+				}
+			} catch (err) {
+				console.error("Error parsing WebSocket message:", err);
+				console.error("Raw message data:", event.data);
+			}
+		}
+
+		ws.onclose = () => {
+			setWsConnected(false);
+		}
+
+		ws.onerror = (err) => {
+			console.error("WebSocket error:", err);
+			setWsConnected(false);
+			setError("WebSocket connection error");
+		}
+
+		return () => {
+			if (ws.readyState === WebSocket.OPEN) {
+				if (currentChat?._id) {
+					leaveChat(currentChat._id);
+				}
+				ws.close();
+			}
+		}
+	}, [currentUser, token]);
+
+	useEffect(() => {
+		if (wsConnected && currentChat?._id) {
+			joinChat(currentChat._id);
+		}
+	}, [currentChat?._id, wsConnected]);
 
 	function openCreateChatModal(): void {
 		setShowCreateChatModal(true);
@@ -84,7 +257,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	}
 
 	async function fetchChats(): Promise<void> {
-		if (!currentUser?._id) return;
+		if (!currentUser?._id)
+			return;
 
 		try {
 			setLoadingChats(true);
@@ -104,14 +278,29 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	}
 
 	async function fetchMessages(): Promise<void> {
-		if (!currentChat?._id) return;
+		if (!currentChat?._id)
+			return;
 
 		try {
 			setLoadingMessages(true);
 			setError(null);
+
 			const response: ApiResponse = await ChatService.getMessages(currentChat._id);
-			setMessages(response.data);
-		} catch (err) {
+
+			const normalizedMessages: IMessage[] = [];
+
+			if (Array.isArray(response.data)) {
+				response.data.forEach((msg: any) => {
+					const normalizedMsg = normalizeMessage(msg);
+					if (normalizedMsg) {
+						normalizedMessages.push(normalizedMsg);
+					}
+				})
+			}
+
+			setMessages(normalizedMessages);
+		} catch (err: any) {
+			console.error("Error fetching messages:", err);
 			if (err.response?.status === 404) {
 				setMessages([]);
 			} else {
@@ -123,35 +312,67 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	}
 
 	async function sendMessage(): Promise<void> {
-		if (!inputValue.trim() || !currentChat?._id || sendingMessage) return;
+		if (!inputValue.trim() || !currentChat?._id || sendingMessage)
+			return;
+
+		if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+			setError("WebSocket connection not available. Please refresh the page.");
+			return;
+		}
 
 		try {
 			setSendingMessage(true);
 			setError(null);
 
-			const response: ApiResponse = await ChatService.createMessage(currentChat._id, inputValue.trim());
-			setMessages((prev) => [...prev, response.data]);
+			const optimisticMessage: IMessage = {
+				_id: `temp-${Date.now()}-${Math.random()}`,
+				userId: currentUser._id,
+				content: inputValue.trim(),
+				createdAt: new Date().toISOString(),
+			}
+
+			setMessages((prev) => {
+				const newMessages = [...prev, optimisticMessage]
+				return newMessages
+			});
+
+			const messagePayload = {
+				type: "message",
+				chatId: currentChat._id,
+				from: currentUser._id,
+				content: inputValue.trim(),
+				tempId: optimisticMessage._id,
+			}
+
+			socketRef.current.send(JSON.stringify(messagePayload));
+
 			setInputValue("");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to send message");
+			setMessages((prev) => prev.filter((msg) => !msg._id.startsWith("temp-")));
 		} finally {
 			setSendingMessage(false);
 		}
 	}
 
 	function selectChat(chat: IChat): void {
+		if (currentChat?._id && wsConnected) {
+			leaveChat(currentChat._id);
+		}
+
 		setCurrentChat(chat);
 		setEditingChatId(null);
 		setEditingHeaderChat(false);
 	}
 
 	function startEditingChat(chatId: string, currentName: string): void {
-		setEditingChatId(chatId)
-		setEditingChatName(currentName)
+		setEditingChatId(chatId);
+		setEditingChatName(currentName);
 	}
 
 	async function saveEditingChat(): Promise<void> {
-		if (!editingChatName.trim() || !editingChatId || updatingChatName) return;
+		if (!editingChatName.trim() || !editingChatId || updatingChatName)
+			return;
 
 		try {
 			setUpdatingChatName(true);
@@ -180,13 +401,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	}
 
 	function startEditingHeaderChat(): void {
-		if (!currentChat) return;
+		if (!currentChat) 
+			return;
 		setEditingHeaderChat(true);
 		setHeaderChatName(currentChat.name);
 	}
 
 	async function saveEditingHeaderChat(): Promise<void> {
-		if (!headerChatName.trim() || !currentChat?._id || updatingChatName) return;
+		if (!headerChatName.trim() || !currentChat?._id || updatingChatName) 
+			return;
 
 		try {
 			setUpdatingChatName(true);
@@ -224,25 +447,25 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 	}
 
 	async function createChat(secondUsername: string, chatName?: string): Promise<void> {
-		if (!secondUsername.trim() || creatingChat) return;
+		if (!secondUsername.trim() || creatingChat)
+			return;
 
 		try {
 			setCreatingChat(true);
 			setError(null);
 
 			secondUsername = secondUsername.trim();
-			if (chatName)
-				chatName = chatName.trim();
-			if (!chatName)
-				chatName = "Awesom Chat";
+			if (chatName) chatName = chatName.trim();
+			if (!chatName) chatName = "Awesome Chat";
 
 			const response: ApiResponse = await ChatService.createChat(secondUsername, chatName);
 			const newChat: IChat = response.data;
 			setAllChats((prev) => {
 				const exists = prev.some((chat) => chat._id === newChat._id);
-				if (exists) return prev;
+				if (exists)
+					return prev;
 				return [newChat, ...prev];
-			});
+			})
 			setCurrentChat(newChat);
 			setShowCreateChatModal(false);
 		} catch (err) {
@@ -277,6 +500,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, currentUse
 		creatingChat,
 		showCreateChatModal,
 		error,
+		wsConnected,
 
 		// Actions
 		setInputValue,
