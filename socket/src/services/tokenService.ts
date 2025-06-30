@@ -9,7 +9,7 @@ class TokenService {
 
   constructor() {
     try {
-      this.publicKey = fs.readFileSync(path.join(__dirname, "../certificates/public.pem"), "utf-8");
+      this.publicKey = fs.readFileSync(path.join(__dirname, "../../certificates/public.pem"), "utf-8");
       console.log("Public key loaded successfully.");
     } catch (error: any) {
       console.error('\n--- CRITICAL ERROR: Failed to load cryptographic certificates ---');
