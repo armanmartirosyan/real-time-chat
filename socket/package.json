@@ -5,7 +5,10 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon"
+    "dev": "npx nodemon",
+    "start": "npm run build && node ./dist/index.js",
+    "build": "npm run clean && npx tsc",
+    "clean": "npx rimraf ./dist"
   },
   "repository": {
     "type": "git",
@@ -20,6 +23,7 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "jsonwebtoken": "^9.0.2",
+    "rimraf": "^6.0.1",
     "ws": "^8.18.2"
   },
   "devDependencies": {

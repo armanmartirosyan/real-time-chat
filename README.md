@@ -8,8 +8,9 @@ A full-stack real-time chat application built with **React.js**, **Node.js**, an
 - [Getting Started](#getting-started)
   - [1. Clone the Repository](#1-clone-the-repository)
   - [2. Create Environment Files](#2-create-environment-files)
-  - [3. Install Dependencies](#3-install-dependencies)
-  - [4. Run the Application](#4-run-the-application)
+  - [3. Create private and public keys](#3-create-private-and-public-keys)
+  - [4. Install Dependencies](#4-install-dependencies)
+  - [5. Run the Application](#5-run-the-application)
 - [Features](#features)
 
 ## Project Structure
@@ -41,7 +42,16 @@ cp socket/.env-example socket/.env
 
 Update the variables in each `.env` file as needed.
 
-### 3. Install Dependencies
+### 3. Create private and public keys
+
+For each directory (`server/`, and `socket/`), create a certificates using this command.
+
+```bash
+openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private.pem -out public.pem
+```
+
+### 4. Install Dependencies
 
 Run the following command in each directory to install dependencies:
 
@@ -49,12 +59,18 @@ Run the following command in each directory to install dependencies:
 npm install
 ```
 
-### 4. Run the Application
+### 5. Run the Application
 
 To start all services in development mode, run the following in each directory:
 
 ```bash
 npm run dev
+```
+
+or you can run in production mode.
+
+```bash
+npm start
 ```
 
 Make sure all services are running simultaneously for full functionality.
