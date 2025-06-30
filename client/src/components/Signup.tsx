@@ -176,9 +176,6 @@ export default function Signup({ isLoginPage, setIsLoginPage }: SignupProps): Re
 							{getErrorMessage("passwordConfirm") && <p className="error-message">{getErrorMessage("passwordConfirm")}</p>}
 							<label>Confirm Password</label>
 						</div>
-						<div className="links">
-							<a href="#">Forgot password</a> <a onClick={setAccount}>Sign In</a>
-						</div>
 						<div className="input-box form-submit-btn">
 							<input type="submit" value="Signup" />
 						</div>

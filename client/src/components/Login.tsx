@@ -123,9 +123,6 @@ export default function Login({ isLoginPage, setIsLoginPage }: LoginProps): Reac
 							{getErrorMessage("password") && <p className="error-message">{getErrorMessage("password")}</p>}
 							<label>Password</label>
 						</div>
-						<div className="links">
-							<a href="#">Forgot password</a> <a onClick={setAccount}>Sign Up</a>
-						</div>
 						<div className="input-box form-submit-btn">
 							<input type="submit" value="Login" />
 						</div>
