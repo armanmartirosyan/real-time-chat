@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "e9c4b012-e03e-4416-987d-a03aa76dc854",
+		"name": "Message-Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45172872",
+		"_collection_link": "https://web.postman.co/workspace/Real-Time-Chat~c67a8db3-b715-4998-b9ca-039bd4e6253f/collection/45172872-e9c4b012-e03e-4416-987d-a03aa76dc854?action=share&source=collection_link&creator=45172872"
+	},
+	"item": [
+		{
+			"name": "Create Message",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "// {\n//     \"chatId\": \"68591f6d3ccb4903500d0acb\",\n//     \"content\": \"and another one\"\n// }\n\n{\n  \"type\": \"message\",\n  \"chatId\": \"685e658ef615051b9973e6bb\",\n  \"userId\": \"68590e9a739b2faddb487896\",\n  \"content\": \"12\",\n  \"tempId\": \"emp-1751018861131-0.08255903473993154\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{BASE_URL}}:{{PORT}}/api/msg/create",
+					"protocol": "http",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"port": "{{PORT}}",
+					"path": [
+						"api",
+						"msg",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Messages",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{BASE_URL}}:{{PORT}}/api/msg/get/:chatId",
+					"protocol": "http",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"port": "{{PORT}}",
+					"path": [
+						"api",
+						"msg",
+						"get",
+						":chatId"
+					],
+					"variable": [
+						{
+							"key": "chatId",
+							"value": "68592692f92566060128340b"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
